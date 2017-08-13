@@ -1,6 +1,7 @@
 package com.xingyanping.dao;
 
 import static com.xingyanping.util.DateUtil.isGT;
+import static com.xingyanping.util.MatchClientUtil.NOT_MATCH;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -25,6 +26,7 @@ import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationExceptio
 import com.xingyanping.datamodel.ClientPortRelationship;
 import com.xingyanping.datamodel.OriginalReport;
 import com.xingyanping.datamodel.UploadedFile;
+import com.xingyanping.util.Config;
 import com.xingyanping.util.ConnectionFactory;
 import com.xingyanping.util.ExcelUtil;
 import com.xingyanping.util.MatchClientUtil;
@@ -33,7 +35,15 @@ import com.xingyanping.util.ZipFileEntry;
 
 public class OriginalReportDao extends BaseDao {
 	private static final UploadedFileDao uploadedFileDao = new UploadedFileDao();
+	private static Set<String> blacklistClients = new HashSet<>();
+	static {
+		String[] blacklistClientsString = Config.get("blacklist.clients").split(",");
+		for (String client : blacklistClientsString) {
+			blacklistClients.add(client);
+		}
+	}
 	private static final ClientPortRelationshipDao clientPortRelationshipDao = new ClientPortRelationshipDao();
+	@SuppressWarnings("resource")
 	public void importFileData(Long upfiId) throws Exception {
 		UploadedFile upfi = uploadedFileDao.get(upfiId);
 		List<OriginalReport> orreList = ExcelUtil.readOriginalReportFromExcel(upfiId, upfi.getName());
@@ -124,8 +134,10 @@ public class OriginalReportDao extends BaseDao {
 		List<ZipFileEntry> entryList = new ArrayList<>();
 		String date = new SimpleDateFormat("yyyyMMdd").format(upfi.getFileUploadForDate());
 		for (String key : clientMap.keySet()) {
-			byte[] blacklistData = generateBlacklistData(clientMap.get(key));
-			entryList.add(new ZipFileEntry(date + "-blacklist/" + date + "黑名单-" + key + ".txt", blacklistData));
+			if (blacklistClients.contains(key)) {
+				byte[] blacklistData = generateBlacklistData(clientMap.get(key));
+				entryList.add(new ZipFileEntry(date + "-blacklist/" + date + "黑名单-" + key + ".txt", blacklistData));
+			}
 		}
 		entryList.add(new ZipFileEntry(date + "-blacklist/" + date + "黑名单-all.txt", generateBlacklistData(reportList)));
 		ZipFileContent zipFileContent = new ZipFileContent();
@@ -136,20 +148,7 @@ public class OriginalReportDao extends BaseDao {
 		Date[] minMaxDates = retrieveMinMaxDate(upfiId);
 		Date[] processMinMaxDates = decideMonth(minMaxDates);
 		List<OriginalReport> reportList = retrieve(processMinMaxDates, upfiId);
-		Collections.sort(reportList, new Comparator<OriginalReport>() {
-			@Override
-			public int compare(OriginalReport o1, OriginalReport o2) {
-				Long fileId1 = o1.getFromFileId();
-				Long fileId2 = o2.getFromFileId();
-				if (fileId1 == upfiId && fileId2 != upfiId) {
-					return 1;
-				} else if (fileId1 != upfiId && fileId2 == upfiId) {
-					return -1;
-				} else {
-					return o1.getReportDate().compareTo(o2.getReportDate());
-				}
-			}
-		});
+		Collections.sort(reportList, new OriginalReportComparator(upfiId));
 		List<ClientPortRelationship> cprsList = clientPortRelationshipDao.retrieveAll();
 		Map<String, List<OriginalReport>> clientMap = new HashMap<>();
 		
@@ -157,12 +156,22 @@ public class OriginalReportDao extends BaseDao {
 			putOriginalReportIntoClientMap(orre, clientMap, cprsList);
 		}
 		
+		List<OriginalReport> allButNotMatch = new ArrayList<>();
 		List<ZipFileEntry> entryList = new ArrayList<>();
+		String yearMonth = new SimpleDateFormat("yyyyMM").format(processMinMaxDates[0]);
 		for (String key : clientMap.keySet()) {
-			byte[] complaintData = generateComplaintData(clientMap.get(key), upfiId);
-			String yearMonth = new SimpleDateFormat("yyyyMM").format(processMinMaxDates[0]);
+			if (key.equals(NOT_MATCH)) {
+				continue;
+			}
+			List<OriginalReport> clientData = clientMap.get(key);
+			allButNotMatch.addAll(clientData);
+			byte[] complaintData = generateComplaintData(clientData, upfiId);
 			entryList.add(new ZipFileEntry(yearMonth + "-complaint/" + yearMonth + "投诉数据-" + key + ".xlsx", complaintData));
 		}
+		
+		Collections.sort(allButNotMatch, new OriginalReportComparator(upfiId));
+		entryList.add(new ZipFileEntry(yearMonth + "-complaint/" + yearMonth + "投诉数据-matched.xlsx", generateComplaintData(allButNotMatch, upfiId)));
+		
 		ZipFileContent zipFileContent = new ZipFileContent();
 		zipFileContent.setEntryList(entryList);
 		return zipFileContent;
@@ -357,5 +366,23 @@ public class OriginalReportDao extends BaseDao {
 			ConnectionFactory.close(rs, pstmt, conn);
 		}
 	}
-	
+	private class OriginalReportComparator implements Comparator<OriginalReport> {
+		private Long upfiId;
+		OriginalReportComparator(Long upfiId) {
+			this.upfiId = upfiId;
+		}
+		@Override
+		public int compare(OriginalReport o1, OriginalReport o2) {
+			Long fileId1 = o1.getFromFileId();
+			Long fileId2 = o2.getFromFileId();
+			if (fileId1 == upfiId && fileId2 != upfiId) {
+				return 1;
+			} else if (fileId1 != upfiId && fileId2 == upfiId) {
+				return -1;
+			} else {
+				return o1.getReportDate().compareTo(o2.getReportDate());
+			}
+		}
+		
+	}
 }

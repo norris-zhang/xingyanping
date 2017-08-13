@@ -6,7 +6,7 @@ import com.xingyanping.datamodel.ClientPortRelationship;
 import com.xingyanping.datamodel.OriginalReport;
 
 public class MatchClientUtil {
-
+	public static final String NOT_MATCH = "NotMatch";
 	public static String matchClient(OriginalReport orre, List<ClientPortRelationship> cprsList) {
 		String matchedPort = "";
 		String clientName = "";
@@ -21,7 +21,7 @@ public class MatchClientUtil {
 			}
 		}
 		if (clientName.trim().length() == 0) {
-			return "NotMatch";
+			return NOT_MATCH;
 		}
 		return clientName;
 	}
