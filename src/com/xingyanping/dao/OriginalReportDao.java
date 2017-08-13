@@ -120,11 +120,12 @@ public class OriginalReportDao extends BaseDao {
 		}
 		
 		List<ZipFileEntry> entryList = new ArrayList<>();
+		String date = new SimpleDateFormat("yyyyMMdd").format(upfi.getFileUploadForDate());
 		for (String key : clientMap.keySet()) {
 			byte[] blacklistData = generateBlacklistData(clientMap.get(key));
-			String date = new SimpleDateFormat("yyyyMMdd").format(upfi.getFileUploadForDate());
 			entryList.add(new ZipFileEntry(date + "-blacklist/" + date + "黑名单-" + key + ".txt", blacklistData));
 		}
+		entryList.add(new ZipFileEntry(date + "-blacklist/" + date + "黑名单-all.txt", generateBlacklistData(reportList)));
 		ZipFileContent zipFileContent = new ZipFileContent();
 		zipFileContent.setEntryList(entryList);
 		return zipFileContent;
