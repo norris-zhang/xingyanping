@@ -25,6 +25,7 @@ import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationExceptio
 import com.xingyanping.datamodel.ClientPortRelationship;
 import com.xingyanping.datamodel.OriginalReport;
 import com.xingyanping.datamodel.UploadedFile;
+import com.xingyanping.util.Config;
 import com.xingyanping.util.ConnectionFactory;
 import com.xingyanping.util.ExcelUtil;
 import com.xingyanping.util.MatchClientUtil;
@@ -33,6 +34,13 @@ import com.xingyanping.util.ZipFileEntry;
 
 public class OriginalReportDao extends BaseDao {
 	private static final UploadedFileDao uploadedFileDao = new UploadedFileDao();
+	private static Set<String> blacklistClients = new HashSet<>();
+	static {
+		String[] blacklistClientsString = Config.get("blacklist.clients").split(",");
+		for (String client : blacklistClientsString) {
+			blacklistClients.add(client);
+		}
+	}
 	private static final ClientPortRelationshipDao clientPortRelationshipDao = new ClientPortRelationshipDao();
 	public void importFileData(Long upfiId) throws Exception {
 		UploadedFile upfi = uploadedFileDao.get(upfiId);
@@ -124,8 +132,10 @@ public class OriginalReportDao extends BaseDao {
 		List<ZipFileEntry> entryList = new ArrayList<>();
 		String date = new SimpleDateFormat("yyyyMMdd").format(upfi.getFileUploadForDate());
 		for (String key : clientMap.keySet()) {
-			byte[] blacklistData = generateBlacklistData(clientMap.get(key));
-			entryList.add(new ZipFileEntry(date + "-blacklist/" + date + "黑名单-" + key + ".txt", blacklistData));
+			if (blacklistClients.contains(key)) {
+				byte[] blacklistData = generateBlacklistData(clientMap.get(key));
+				entryList.add(new ZipFileEntry(date + "-blacklist/" + date + "黑名单-" + key + ".txt", blacklistData));
+			}
 		}
 		entryList.add(new ZipFileEntry(date + "-blacklist/" + date + "黑名单-all.txt", generateBlacklistData(reportList)));
 		ZipFileContent zipFileContent = new ZipFileContent();
