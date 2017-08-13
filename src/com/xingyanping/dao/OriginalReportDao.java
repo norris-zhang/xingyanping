@@ -18,6 +18,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -169,12 +170,26 @@ public class OriginalReportDao extends BaseDao {
 			entryList.add(new ZipFileEntry(yearMonth + "-complaint/" + yearMonth + "投诉数据-" + key + ".xlsx", complaintData));
 		}
 		
+		removeHistoryData(allButNotMatch, upfiId);
 		Collections.sort(allButNotMatch, new OriginalReportComparator(upfiId));
-		entryList.add(new ZipFileEntry(yearMonth + "-complaint/" + yearMonth + "投诉数据-matched.xlsx", generateComplaintData(allButNotMatch, upfiId)));
+		entryList.add(new ZipFileEntry(yearMonth + "-complaint/" + yearMonth + "投诉数据-matched-new.xlsx", generateComplaintDataWithExtraColumns(allButNotMatch, upfiId)));
 		
 		ZipFileContent zipFileContent = new ZipFileContent();
 		zipFileContent.setEntryList(entryList);
 		return zipFileContent;
+	}
+	private byte[] generateComplaintDataWithExtraColumns(List<OriginalReport> list, Long lastFileId) throws IOException {
+		ByteArrayOutputStream baout = new ByteArrayOutputStream();
+		ExcelUtil.writeOriginalReportToExcelWithExtraColumns(list, baout);
+		return baout.toByteArray();
+	}
+	private void removeHistoryData(List<OriginalReport> orreList, Long upfiId) {
+		for (Iterator<OriginalReport> iter = orreList.iterator(); iter.hasNext(); ) {
+			OriginalReport orre = iter.next();
+			if (!orre.getFromFileId().equals(upfiId)) {
+				iter.remove();
+			}
+		}
 	}
 	private List<OriginalReport> retrieve(Date[] processMinMaxDates, Long tillFileId) throws SQLException {
 		List<OriginalReport> orreList = new ArrayList<>();

@@ -22,6 +22,8 @@ public class OriginalReport extends BaseDatamodel {
 	
 	private UploadedFile fromFile;
 	
+	private ClientPortRelationship matchesClientPortRelationship;
+	
 	public Long getId() {
 		return id;
 	}
@@ -117,6 +119,12 @@ public class OriginalReport extends BaseDatamodel {
 	}
 	public void setFromFile(UploadedFile fromFile) {
 		this.fromFile = fromFile;
+	}
+	public ClientPortRelationship getMatchesClientPortRelationship() {
+		return matchesClientPortRelationship;
+	}
+	public void setMatchesClientPortRelationship(ClientPortRelationship matchesClientPortRelationship) {
+		this.matchesClientPortRelationship = matchesClientPortRelationship;
 	}
 	
 }
