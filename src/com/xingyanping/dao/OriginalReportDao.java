@@ -12,6 +12,8 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -133,7 +135,21 @@ public class OriginalReportDao extends BaseDao {
 	public ZipFileContent getMonthlyComplaint(Long upfiId) throws SQLException, IOException {
 		Date[] minMaxDates = retrieveMinMaxDate(upfiId);
 		Date[] processMinMaxDates = decideMonth(minMaxDates);
-		List<OriginalReport> reportList = retrieve(processMinMaxDates);
+		List<OriginalReport> reportList = retrieve(processMinMaxDates, upfiId);
+		Collections.sort(reportList, new Comparator<OriginalReport>() {
+			@Override
+			public int compare(OriginalReport o1, OriginalReport o2) {
+				Long fileId1 = o1.getFromFileId();
+				Long fileId2 = o2.getFromFileId();
+				if (fileId1 == upfiId && fileId2 != upfiId) {
+					return 1;
+				} else if (fileId1 != upfiId && fileId2 == upfiId) {
+					return -1;
+				} else {
+					return o1.getReportDate().compareTo(o2.getReportDate());
+				}
+			}
+		});
 		List<ClientPortRelationship> cprsList = clientPortRelationshipDao.retrieveAll();
 		Map<String, List<OriginalReport>> clientMap = new HashMap<>();
 		
@@ -143,7 +159,7 @@ public class OriginalReportDao extends BaseDao {
 		
 		List<ZipFileEntry> entryList = new ArrayList<>();
 		for (String key : clientMap.keySet()) {
-			byte[] complaintData = generateComplaintData(clientMap.get(key));
+			byte[] complaintData = generateComplaintData(clientMap.get(key), upfiId);
 			String yearMonth = new SimpleDateFormat("yyyyMM").format(processMinMaxDates[0]);
 			entryList.add(new ZipFileEntry(yearMonth + "-complaint/" + yearMonth + "投诉数据-" + key + ".xlsx", complaintData));
 		}
@@ -151,7 +167,7 @@ public class OriginalReportDao extends BaseDao {
 		zipFileContent.setEntryList(entryList);
 		return zipFileContent;
 	}
-	private List<OriginalReport> retrieve(Date[] processMinMaxDates) throws SQLException {
+	private List<OriginalReport> retrieve(Date[] processMinMaxDates, Long tillFileId) throws SQLException {
 		List<OriginalReport> orreList = new ArrayList<>();
 		
 		Connection conn = null;
@@ -159,10 +175,12 @@ public class OriginalReportDao extends BaseDao {
 		ResultSet rs = null;
 		try {
 			conn = ConnectionFactory.getConnection();
-			String sql = "select * from original_report where orre_report_date>=? and orre_report_date<=? order by orre_report_date";
+			String sql = "select orre.* from original_report orre join uploaded_file upfi on orre.orre_from_file_id=upfi.upfi_id"
+					+ " where orre.orre_report_date>=? and orre.orre_report_date<=? and upfi.upfi_file_upload_for_date<=(select upfi_file_upload_for_date from uploaded_file where upfi_id=?) order by orre_report_date";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setTimestamp(1, new Timestamp(processMinMaxDates[0].getTime()));
 			pstmt.setTimestamp(2, new Timestamp(processMinMaxDates[1].getTime()));
+			pstmt.setLong(3, tillFileId);
 			
 			rs = pstmt.executeQuery();
 			while (rs.next()) {
@@ -269,9 +287,9 @@ public class OriginalReportDao extends BaseDao {
 			ConnectionFactory.close(rs, pstmt, conn);
 		}
 	}
-	private byte[] generateComplaintData(List<OriginalReport> list) throws IOException {
+	private byte[] generateComplaintData(List<OriginalReport> list, Long lastFileId) throws IOException {
 		ByteArrayOutputStream baout = new ByteArrayOutputStream();
-		ExcelUtil.writeOriginalReportToExcel(list, baout);
+		ExcelUtil.writeOriginalReportToExcel(list, baout, lastFileId);
 		return baout.toByteArray();
 	}
 	private byte[] generateBlacklistData(List<OriginalReport> orreList) {

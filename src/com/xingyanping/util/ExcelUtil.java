@@ -21,11 +21,14 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.util.CellReference;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.xingyanping.datamodel.OriginalReport;
@@ -170,8 +173,8 @@ public class ExcelUtil {
 			}
 		}
 	}
-	public static void writeOriginalReportToExcel(List<OriginalReport> list, OutputStream out) throws IOException {
-		Workbook wb = new XSSFWorkbook();
+	public static void writeOriginalReportToExcel(List<OriginalReport> list, OutputStream out, Long lastFileId) throws IOException {
+		XSSFWorkbook wb = new XSSFWorkbook();
 		CreationHelper createHelper = wb.getCreationHelper();
 		Sheet sheet = wb.createSheet("不良信息资料查询");
 		
@@ -192,6 +195,15 @@ public class ExcelUtil {
 		
 		CellStyle reportDateCellStyle = wb.createCellStyle();
 		reportDateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("yyyy-mm-dd"));
+		
+		CellStyle newDataStyle = wb.createCellStyle();
+		newDataStyle.setFillForegroundColor(IndexedColors.AQUA.getIndex());
+		newDataStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+		
+		CellStyle newDataReportDateCellStyle = wb.createCellStyle();
+		newDataReportDateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("yyyy-mm-dd"));
+		newDataReportDateCellStyle.setFillForegroundColor(IndexedColors.AQUA.getIndex());
+		newDataReportDateCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 		for (OriginalReport orre : list) {
 			Row row = sheet.createRow(rowNum++);
 			row.createCell(0).setCellValue(createHelper.createRichTextString(orre.getServerRequestIdentifier()));
@@ -207,6 +219,15 @@ public class ExcelUtil {
 			row.createCell(8).setCellValue(createHelper.createRichTextString(orre.getBizPlatform()));
 			row.createCell(9).setCellValue(createHelper.createRichTextString(orre.getReportObjectType()));
 			row.createCell(10).setCellValue(createHelper.createRichTextString(orre.getReportContent()));
+			if (orre.getFromFileId() == lastFileId) {
+				for (Cell cell : row) {
+					if (cell.getColumnIndex() == 3) {
+						cell.setCellStyle(newDataReportDateCellStyle);
+					} else {
+						cell.setCellStyle(newDataStyle);
+					}
+				}
+			}
 		}
 		wb.write(out);
 		wb.close();
