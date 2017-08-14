@@ -167,7 +167,9 @@ public class OriginalReportDao extends BaseDao {
 			List<OriginalReport> clientData = clientMap.get(key);
 			allButNotMatch.addAll(clientData);
 			byte[] complaintData = generateComplaintData(clientData, upfiId);
-			entryList.add(new ZipFileEntry(yearMonth + "-complaint/" + yearMonth + "投诉数据-" + key + ".xlsx", complaintData));
+			if (complaintData != null) {
+				entryList.add(new ZipFileEntry(yearMonth + "-complaint/" + yearMonth + "投诉数据-" + key + ".xlsx", complaintData));
+			}
 		}
 		
 		removeHistoryData(allButNotMatch, upfiId);
@@ -312,6 +314,10 @@ public class OriginalReportDao extends BaseDao {
 		}
 	}
 	private byte[] generateComplaintData(List<OriginalReport> list, Long lastFileId) throws IOException {
+		boolean anyMatch = list.stream().anyMatch((e)->e.getFromFileId() == lastFileId);
+		if (!anyMatch) {
+			return null;
+		}
 		ByteArrayOutputStream baout = new ByteArrayOutputStream();
 		ExcelUtil.writeOriginalReportToExcel(list, baout, lastFileId);
 		return baout.toByteArray();
