@@ -188,7 +188,7 @@ public class ExcelUtil {
 		title.createCell(5).setCellValue(createHelper.createRichTextString("被举报号码归属省"));
 		title.createCell(6).setCellValue(createHelper.createRichTextString("归属地市"));
 		title.createCell(7).setCellValue(createHelper.createRichTextString("服务请求类别"));
-		title.createCell(8).setCellValue(createHelper.createRichTextString("业务平台名称"));
+		title.createCell(8);
 		title.createCell(9).setCellValue(createHelper.createRichTextString("举报对象类型"));
 		title.createCell(10).setCellValue(createHelper.createRichTextString("举报内容"));
 		
@@ -215,7 +215,7 @@ public class ExcelUtil {
 			row.createCell(5).setCellValue(createHelper.createRichTextString(orre.getReportedProvince()));
 			row.createCell(6).setCellValue(createHelper.createRichTextString(orre.getReportedCity()));
 			row.createCell(7).setCellValue(createHelper.createRichTextString(orre.getServerRequestType()));
-			row.createCell(8).setCellValue(createHelper.createRichTextString(orre.getBizPlatform()));
+			row.createCell(8);
 			row.createCell(9).setCellValue(createHelper.createRichTextString(orre.getReportObjectType()));
 			row.createCell(10).setCellValue(createHelper.createRichTextString(orre.getReportContent()));
 			if (orre.getFromFileId() == lastFileId) {
