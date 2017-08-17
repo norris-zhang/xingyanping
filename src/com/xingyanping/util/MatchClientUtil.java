@@ -15,6 +15,7 @@ public class MatchClientUtil {
 		clientNameFilter.put("国都1095", "国都");
 		clientNameFilter.put("国都1100", "国都");
 		clientNameFilter.put("国都1106", "国都");
+		clientNameFilter.put("国都003617", "国都");
 	}
 	public static String matchClient(OriginalReport orre, List<ClientPortRelationship> cprsList) {
 		ClientPortRelationship matchedCprs = null;
