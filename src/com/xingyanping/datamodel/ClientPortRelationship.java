@@ -10,6 +10,8 @@ public class ClientPortRelationship extends BaseDatamodel {
 	private String companyShortName;
 	private String client;
 	private Date updated;
+	private Date effectiveDate;
+	private Date expiringDate;
 	public Long getId() {
 		return id;
 	}
@@ -45,6 +47,18 @@ public class ClientPortRelationship extends BaseDatamodel {
 	}
 	public void setUpdated(Date updated) {
 		this.updated = updated;
+	}
+	public Date getEffectiveDate() {
+		return effectiveDate;
+	}
+	public void setEffectiveDate(Date effectiveDate) {
+		this.effectiveDate = effectiveDate;
+	}
+	public Date getExpiringDate() {
+		return expiringDate;
+	}
+	public void setExpiringDate(Date expiringDate) {
+		this.expiringDate = expiringDate;
 	}
 	
 }
