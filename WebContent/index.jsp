@@ -20,6 +20,10 @@ List<UploadedFile> uploadedFiles = new UploadedFileDao().retrieve();
 </head>
 <body>
 <div>
+<a href="${ctx}/clients">客户关系维护</a>
+</div>
+<hr/>
+<div>
 	<form action="${ctx}/upload" method="post" enctype="multipart/form-data">
 		<table>
 			<tr>
