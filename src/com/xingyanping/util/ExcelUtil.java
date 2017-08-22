@@ -20,6 +20,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.IndexedColors;
@@ -127,7 +128,8 @@ public class ExcelUtil {
 			if (DateUtil.isCellDateFormatted(cell)) {
 				return cell.getDateCellValue().toString();
 			} else {
-				return "" + cell.getNumericCellValue();
+				DataFormatter df = new DataFormatter();
+				return df.formatCellValue(cell);
 			}
 		} else if (cellType == BOOLEAN) {
 			return "" + cell.getBooleanCellValue();
