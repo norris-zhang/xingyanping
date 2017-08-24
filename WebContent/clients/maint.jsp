@@ -14,6 +14,8 @@ Map<String, List<ClientPortRelationship>> clientMap = (Map<String, List<ClientPo
 <title>Insert title here</title>
 </head>
 <body>
+<jsp:include page="/segments/header.jsp"></jsp:include>
+<hr/>
 <div>Client Maintenance</div>
 <hr/>
 <div>

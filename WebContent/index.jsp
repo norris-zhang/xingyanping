@@ -19,9 +19,7 @@ List<UploadedFile> uploadedFiles = new UploadedFileDao().retrieve();
 <title>Insert title here</title>
 </head>
 <body>
-<div>
-<a href="${ctx}/clients">客户关系维护</a>
-</div>
+<jsp:include page="/segments/header.jsp"></jsp:include>
 <hr/>
 <div>
 	<form action="${ctx}/upload" method="post" enctype="multipart/form-data">
@@ -44,28 +42,41 @@ List<UploadedFile> uploadedFiles = new UploadedFileDao().retrieve();
 </div>
 <hr />
 <table border="1">
+<thead>
 	<tr>
 		<th>文件名</th>
 		<th>文件日期</th>
-		<th>文件内容结束日期</th>
 		<th>上传时间</th>
 		<th>有效数据</th>
 		<th></th>
+		<th></th>
+		<th></th>
 	</tr>
+</thead>
+<tbody>
 	<% for (UploadedFile file : uploadedFiles) { %>
+		<% SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd"); %>
+		<% SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm"); %>
 	<tr>
 		<td><%= file.getName() %></td>
-		<td><%= file.getFileUploadForDate() %></td>
-		<td><%= file.getFileDate() %></td>
-		<td><%= file.getUpdated() %></td>
+		<td><%= dateFormatter.format(file.getFileUploadForDate()) %></td>
+		<td><%= dateTimeFormatter.format(file.getUpdated()) %></td>
 		<td><%= file.getOriginalReportCount() %></td>
 		<td>
-			<a href="${ctx}/dl/blacklist?id=<%= file.getId() %>">下载黑名单</a>
-			<a href="${ctx}/dl/monthlycomplaint?id=<%= file.getId() %>">下载当月投诉数据</a>
+			<a href="${ctx}/dl/blacklist?id=<%= file.getId() %>">下载黑名单</a><br/>
+			<a href="${ctx}/dl/monthlycomplaint?id=<%= file.getId() %>">下载当月投诉数据</a><br/>
 			<a href="${ctx}/file/delete?id=<%= file.getId() %>" onclick="return confirmDelete()">删除文件</a>
+		</td>
+		<td>
+			<a href="#">查看当日数据</a><br/>
+			<a href="#">查看当月数据</a>
+		</td>
+		<td>
+			<a href="#">导出当月数据</a>
 		</td>
 	</tr>
 	<% } %>
+</tbody>
 </table>
 <script type="text/javascript">
 function confirmDelete() {

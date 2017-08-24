@@ -15,7 +15,9 @@ ClientPortRelationship client = new ClientPortRelationshipDao().get(id);
 <title>Insert title here</title>
 </head>
 <body>
-<div>Edit</div>
+<jsp:include page="/segments/header.jsp"></jsp:include>
+<hr/>
+<div>Edit a client</div>
 <hr/>
 <div>
 <form action="${ctx}/client/edit" method="post">
