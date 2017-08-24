@@ -19,6 +19,8 @@ public class OriginalReport extends BaseDatamodel {
 	private String reportContent;
 	private String yearMonth;
 	private Date updated;
+	private String distContent;
+	private String complaintType;
 	
 	private UploadedFile fromFile;
 	
@@ -125,6 +127,18 @@ public class OriginalReport extends BaseDatamodel {
 	}
 	public void setMatchesClientPortRelationship(ClientPortRelationship matchesClientPortRelationship) {
 		this.matchesClientPortRelationship = matchesClientPortRelationship;
+	}
+	public String getDistContent() {
+		return distContent;
+	}
+	public void setDistContent(String distContent) {
+		this.distContent = distContent;
+	}
+	public String getComplaintType() {
+		return complaintType;
+	}
+	public void setComplaintType(String complaintType) {
+		this.complaintType = complaintType;
 	}
 	
 }
