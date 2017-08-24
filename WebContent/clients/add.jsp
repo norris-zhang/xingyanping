@@ -16,7 +16,9 @@ if (port == null || port.trim().length() == 0){
 <title>Insert title here</title>
 </head>
 <body>
-<div>Edit</div>
+<jsp:include page="/segments/header.jsp"></jsp:include>
+<hr/>
+<div>Add a client</div>
 <hr/>
 <div>
 <form action="${ctx}/client/add" method="post">
