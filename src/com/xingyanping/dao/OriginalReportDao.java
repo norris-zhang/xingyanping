@@ -12,7 +12,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -24,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
+import com.xingyanping.dao.helper.OriginalReportDaoRetrieveMonthHelper;
 import com.xingyanping.datamodel.ClientPortRelationship;
 import com.xingyanping.datamodel.OriginalReport;
 import com.xingyanping.datamodel.UploadedFile;
@@ -146,40 +146,52 @@ public class OriginalReportDao extends BaseDao {
 		return zipFileContent;
 	}
 	public ZipFileContent getMonthlyComplaint(Long upfiId) throws SQLException, IOException {
-		Date[] minMaxDates = retrieveMinMaxDate(upfiId);
-		Date[] processMinMaxDates = decideMonth(minMaxDates);
-		List<OriginalReport> reportList = retrieve(processMinMaxDates, upfiId);
-		Collections.sort(reportList, new OriginalReportComparator(upfiId));
-		List<ClientPortRelationship> cprsList = clientPortRelationshipDao.retrieveAll();
-		Map<String, List<OriginalReport>> clientMap = new HashMap<>();
-		
-		for (OriginalReport orre : reportList) {
-			putOriginalReportIntoClientMap(orre, clientMap, cprsList);
-		}
-		
-		List<OriginalReport> allButNotMatch = new ArrayList<>();
-		List<ZipFileEntry> entryList = new ArrayList<>();
-		String yearMonth = new SimpleDateFormat("yyyyMM").format(processMinMaxDates[0]);
-		for (String key : clientMap.keySet()) {
-			if (key.equals(NOT_MATCH)) {
-				continue;
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		try {
+			conn = ConnectionFactory.getConnection();
+			
+			OriginalReportDaoRetrieveMonthHelper monthHelper = new OriginalReportDaoRetrieveMonthHelper(conn);
+			List<OriginalReport> reportList = monthHelper.retrieve(upfiId);
+			
+			Collections.sort(reportList, new OriginalReportComparator(upfiId));
+			List<ClientPortRelationship> cprsList = clientPortRelationshipDao.retrieveAll();
+			Map<String, List<OriginalReport>> clientMap = new HashMap<>();
+			
+			for (OriginalReport orre : reportList) {
+				putOriginalReportIntoClientMap(orre, clientMap, cprsList);
 			}
-			List<OriginalReport> clientData = clientMap.get(key);
-			allButNotMatch.addAll(clientData);
-			byte[] complaintData = generateComplaintData(clientData, upfiId);
-			if (complaintData != null) {
-				entryList.add(new ZipFileEntry(yearMonth + "-complaint/" + yearMonth + "投诉数据-" + key + ".xlsx", complaintData));
+			
+			List<OriginalReport> allButNotMatch = new ArrayList<>();
+			List<ZipFileEntry> entryList = new ArrayList<>();
+			String yearMonth = new SimpleDateFormat("yyyyMM").format(monthHelper.getProcessedMinMaxDates()[0]);
+			for (String key : clientMap.keySet()) {
+				if (key.equals(NOT_MATCH)) {
+					continue;
+				}
+				List<OriginalReport> clientData = clientMap.get(key);
+				allButNotMatch.addAll(clientData);
+				byte[] complaintData = generateComplaintData(clientData, upfiId);
+				if (complaintData != null) {
+					entryList.add(new ZipFileEntry(yearMonth + "-complaint/" + yearMonth + "投诉数据-" + key + ".xlsx", complaintData));
+				}
 			}
+			
+			removeHistoryData(allButNotMatch, upfiId);
+			Collections.sort(allButNotMatch, new OriginalReportComparator(upfiId));
+			entryList.add(new ZipFileEntry(yearMonth + "-complaint/" + yearMonth + "投诉数据-matched-new.xlsx", generateComplaintDataWithExtraColumns(allButNotMatch, upfiId)));
+			
+			ZipFileContent zipFileContent = new ZipFileContent();
+			zipFileContent.setEntryList(entryList);
+			return zipFileContent;
+		} catch (ClassNotFoundException e) {
+			throw new SQLException(e);
+		} finally {
+			ConnectionFactory.close(rs, pstmt, conn);
 		}
-		
-		removeHistoryData(allButNotMatch, upfiId);
-		Collections.sort(allButNotMatch, new OriginalReportComparator(upfiId));
-		entryList.add(new ZipFileEntry(yearMonth + "-complaint/" + yearMonth + "投诉数据-matched-new.xlsx", generateComplaintDataWithExtraColumns(allButNotMatch, upfiId)));
-		
-		ZipFileContent zipFileContent = new ZipFileContent();
-		zipFileContent.setEntryList(entryList);
-		return zipFileContent;
 	}
+
 	private byte[] generateComplaintDataWithExtraColumns(List<OriginalReport> list, Long lastFileId) throws IOException {
 		ByteArrayOutputStream baout = new ByteArrayOutputStream();
 		ExcelUtil.writeOriginalReportToExcelWithExtraColumns(list, baout);
@@ -191,126 +203,6 @@ public class OriginalReportDao extends BaseDao {
 			if (!orre.getFromFileId().equals(upfiId)) {
 				iter.remove();
 			}
-		}
-	}
-	private List<OriginalReport> retrieve(Date[] processMinMaxDates, Long tillFileId) throws SQLException {
-		List<OriginalReport> orreList = new ArrayList<>();
-		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		try {
-			conn = ConnectionFactory.getConnection();
-			String sql = "select orre.* from original_report orre join uploaded_file upfi on orre.orre_from_file_id=upfi.upfi_id"
-					+ " where orre.orre_report_date>=? and orre.orre_report_date<=? and upfi.upfi_file_upload_for_date<=(select upfi_file_upload_for_date from uploaded_file where upfi_id=?) order by orre_report_date";
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setTimestamp(1, new Timestamp(processMinMaxDates[0].getTime()));
-			pstmt.setTimestamp(2, new Timestamp(processMinMaxDates[1].getTime()));
-			pstmt.setLong(3, tillFileId);
-			
-			rs = pstmt.executeQuery();
-			while (rs.next()) {
-				OriginalReport orre = new OriginalReport();
-				orre.setId(rs.getLong("orre_id"));
-				orre.setFromFileId(rs.getLong("orre_from_file_id"));
-				orre.setServerRequestIdentifier(rs.getString("orre_server_request_identifier"));
-				orre.setReportMobileNumber(rs.getString("orre_report_mobile_number"));
-				orre.setReportProvince(rs.getString("orre_report_province"));
-				Timestamp reportDate = rs.getTimestamp("orre_report_date");
-				if (reportDate != null) {
-					orre.setReportDate(new Date(reportDate.getTime()));
-				}
-				orre.setReportedNumber(rs.getString("orre_reported_number"));
-				orre.setReportedProvince(rs.getString("orre_reported_province"));
-				orre.setReportedCity(rs.getString("orre_reported_city"));
-				orre.setServerRequestType(rs.getString("orre_server_request_type"));
-				orre.setBizPlatform(rs.getString("orre_biz_platform"));
-				orre.setReportObjectType(rs.getString("orre_report_object_type"));
-				orre.setReportContent(rs.getString("orre_report_content"));
-				orre.setYearMonth(rs.getString("orre_year_month"));
-				orre.setUpdated(new Date(rs.getTimestamp("orre_updated").getTime()));
-				
-				orreList.add(orre);
-			}
-			
-			return orreList;
-		} catch (ClassNotFoundException | SQLException e) {
-			throw new SQLException(e);
-		} finally {
-			ConnectionFactory.close(rs, pstmt, conn);
-		}
-	}
-	private Date[] decideMonth(Date[] minMaxDates) {
-		if (minMaxDates[0] == null || minMaxDates[1] == null) {
-			return null;
-		}
-		Calendar c1 = Calendar.getInstance();
-		c1.setTime(minMaxDates[0]);
-		Calendar c2 = Calendar.getInstance();
-		c2.setTime(minMaxDates[1]);
-		
-		int minMonth = c1.get(Calendar.MONTH);
-		int maxMonth = c2.get(Calendar.MONTH);
-		if (minMonth != maxMonth) {
-			return wholeMonth(c1);
-		} else {
-			return monthTill(c2);
-		}
-	}
-	private Date[] monthTill(Calendar c) {
-		Date max = c.getTime();
-		
-		c.set(Calendar.DATE, 1);
-		c.set(Calendar.HOUR_OF_DAY, 0);
-		c.set(Calendar.MINUTE, 0);
-		c.set(Calendar.SECOND, 0);
-		c.set(Calendar.MILLISECOND, 0);
-		Date min = c.getTime();
-		
-		return new Date[]{min, max};
-	}
-	private Date[] wholeMonth(Calendar c) {
-		c.set(Calendar.DATE, 1);
-		c.set(Calendar.HOUR_OF_DAY, 0);
-		c.set(Calendar.MINUTE, 0);
-		c.set(Calendar.SECOND, 0);
-		c.set(Calendar.MILLISECOND, 0);
-		Date min = c.getTime();
-		
-		c.add(Calendar.MONTH, 1);
-		c.add(Calendar.MILLISECOND, -1);
-		Date max = c.getTime();
-		
-		return new Date[]{min, max};
-	}
-	private Date[] retrieveMinMaxDate(Long upfiId) throws SQLException {
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		try {
-			conn = ConnectionFactory.getConnection();
-			String sql = "select min(orre_report_date), max(orre_report_date) from original_report where orre_from_file_id=? and orre_report_date is not null";
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setLong(1, upfiId);
-			
-			rs = pstmt.executeQuery();
-			Date[] minMaxDate = new Date[2];
-			while (rs.next()) {
-				Timestamp minDate = rs.getTimestamp(1);
-				Timestamp maxDate = rs.getTimestamp(2);
-				if (minDate != null) {
-					minMaxDate[0] = new Date(minDate.getTime());
-				}
-				if (maxDate != null) {
-					minMaxDate[1] = new Date(maxDate.getTime());
-				}
-			}
-			
-			return minMaxDate;
-		} catch (ClassNotFoundException | SQLException e) {
-			throw new SQLException(e);
-		} finally {
-			ConnectionFactory.close(rs, pstmt, conn);
 		}
 	}
 	private byte[] generateComplaintData(List<OriginalReport> list, Long lastFileId) throws IOException {
@@ -406,4 +298,5 @@ public class OriginalReportDao extends BaseDao {
 		}
 		
 	}
+
 }

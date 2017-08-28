@@ -1,5 +1,8 @@
 package com.xingyanping.datamodel;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Date;
 
 public class OriginalReport extends BaseDatamodel {
@@ -26,6 +29,29 @@ public class OriginalReport extends BaseDatamodel {
 	
 	private ClientPortRelationship matchesClientPortRelationship;
 	
+	public OriginalReport populate(ResultSet rs) throws SQLException {
+		this.setId(rs.getLong("orre_id"));
+		this.setFromFileId(rs.getLong("orre_from_file_id"));
+		this.setServerRequestIdentifier(rs.getString("orre_server_request_identifier"));
+		this.setReportMobileNumber(rs.getString("orre_report_mobile_number"));
+		this.setReportProvince(rs.getString("orre_report_province"));
+		Timestamp reportDate = rs.getTimestamp("orre_report_date");
+		if (reportDate != null) {
+			this.setReportDate(new Date(reportDate.getTime()));
+		}
+		this.setReportedNumber(rs.getString("orre_reported_number"));
+		this.setReportedProvince(rs.getString("orre_reported_province"));
+		this.setReportedCity(rs.getString("orre_reported_city"));
+		this.setServerRequestType(rs.getString("orre_server_request_type"));
+		this.setBizPlatform(rs.getString("orre_biz_platform"));
+		this.setReportObjectType(rs.getString("orre_report_object_type"));
+		this.setReportContent(rs.getString("orre_report_content"));
+		this.setYearMonth(rs.getString("orre_year_month"));
+		this.setUpdated(new Date(rs.getTimestamp("orre_updated").getTime()));
+		this.setDistContent(rs.getString("orre_dist_content"));
+		this.setComplaintType(rs.getString("orre_complaint_type"));
+		return this;
+	}
 	public Long getId() {
 		return id;
 	}
