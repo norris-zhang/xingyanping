@@ -56,7 +56,7 @@ public class OriginalReportDao extends BaseDao {
 			Date latestFileDate = null;
 			conn = ConnectionFactory.getConnection();
 			conn.setAutoCommit(false);
-			String sql = "insert into original_report (`orre_from_file_id`, `orre_server_request_identifier`, `orre_report_mobile_number`, `orre_report_province`, `orre_report_date`, `orre_reported_number`, `orre_reported_province`, `orre_reported_city`, `orre_server_request_type`, `orre_biz_platform`, `orre_report_object_type`, `orre_report_content`, `orre_year_month`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			String sql = "insert into original_report (`orre_from_file_id`, `orre_server_request_identifier`, `orre_report_mobile_number`, `orre_report_province`, `orre_report_date`, `orre_reported_number`, `orre_reported_province`, `orre_reported_city`, `orre_server_request_type`, `orre_biz_platform`, `orre_report_object_type`, `orre_report_content`, `orre_year_month`, `orre_dist_content`, `orre_complaint_type`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 			pstmt = conn.prepareStatement(sql);
 			
 			for (OriginalReport orre : orreList) {
@@ -86,6 +86,10 @@ public class OriginalReportDao extends BaseDao {
 				pstmt.setString(12, orre.getReportContent());
 				//13. `orre_year_month`
 				pstmt.setString(13, orre.getYearMonth());
+				//14. `orre_dist_content`
+				pstmt.setString(14, null);
+				//15. `orre_complaint_type`
+				pstmt.setString(15, "未分类");
 
 				try {
 					pstmt.executeUpdate();
