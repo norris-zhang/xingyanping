@@ -68,8 +68,8 @@ List<UploadedFile> uploadedFiles = new UploadedFileDao().retrieve();
 			<a href="${ctx}/file/delete?id=<%= file.getId() %>" onclick="return confirmDelete()">删除文件</a>
 		</td>
 		<td>
-			<a href="#">查看当日数据</a><br/>
-			<a href="#">查看当月数据</a>
+			<a href="${ctx}/orre/view?id=<%= file.getId() %>&r=d">查看当日数据</a><br/>
+			<a href="${ctx}/orre/view?id=<%= file.getId() %>&r=m">查看当月数据</a>
 		</td>
 		<td>
 			<a href="#">导出当月数据</a>
