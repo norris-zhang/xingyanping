@@ -302,5 +302,37 @@ public class OriginalReportDao extends BaseDao {
 		}
 		
 	}
+	public void updateDistContent(Long id, String distContent) throws SQLException {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		try {
+			conn = ConnectionFactory.getConnection();
+			String sql = "update original_report set orre_dist_content=? where orre_id=?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, distContent);
+			pstmt.setLong(2, id);
+			pstmt.executeUpdate();
+		} catch (ClassNotFoundException e) {
+			throw new SQLException(e);
+		} finally {
+			ConnectionFactory.close(null, pstmt, conn);
+		}
+	}
+	public void updateComplaintType(Long id, String complaintType) throws SQLException {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		try {
+			conn = ConnectionFactory.getConnection();
+			String sql = "update original_report set orre_complaint_type=? where orre_id=?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, complaintType);
+			pstmt.setLong(2, id);
+			pstmt.executeUpdate();
+		} catch (ClassNotFoundException e) {
+			throw new SQLException(e);
+		} finally {
+			ConnectionFactory.close(null, pstmt, conn);
+		}
+	}
 
 }

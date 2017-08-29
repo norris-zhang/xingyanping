@@ -2,6 +2,7 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%
 request.setAttribute("ctx", request.getContextPath());
 %>
@@ -65,20 +66,108 @@ request.setAttribute("ctx", request.getContextPath());
 		<td><p style="max-width: 250px;"><c:out value="${orre.bizPlatform }"></c:out></p></td>
 		<td><c:out value="${orre.reportObjectType }"></c:out></td>
 		<td><p style="max-width: 350px; overflow: hidden;"><c:out value="${orre.reportContent }"></c:out></p></td>
-		<td>
-			<c:choose>
-				<c:when test="${empty orre.distContent }">未填写</c:when>
-				<c:otherwise><c:out value="${orre.distContent }"></c:out></c:otherwise>
-			</c:choose>
-			<br/><a href="#">修改</a>
+		<td style="max-width: 100px;">
+			<div id="editDistContent${orre.id}">
+				<div id="distContentDisp${orre.id}">
+					<c:choose>
+						<c:when test="${empty fn:trim(orre.distContent) }">未填写</c:when>
+						<c:otherwise><c:out value="${orre.distContent }"></c:out></c:otherwise>
+					</c:choose>
+				</div>
+				<br/><a href="#" onclick="return editDistContent(${orre.id})">修改</a>
+			</div>
+			<div id="textarea${orre.id}" style="display: none;">
+				<textarea id="distContent${orre.id}" style="width: 95px;" rows="5">${orre.distContent }</textarea>
+				<br/>
+				<a href="#" onclick="return saveDistContent(${orre.id})">保存</a>
+			</div>
 		</td>
-		<td><c:out value="${orre.complaintType }"></c:out><br/><a href="#">修改</a></td>
+		<td>
+			<div id="editComplaintType${orre.id}">
+				<div id="complaintTypeDisp${orre.id}"><c:out value="${orre.complaintType }"></c:out></div>
+				<br/><a href="#" onclick="return editComplaintType(${orre.id})">修改</a>
+			</div>
+			<div id="select${orre.id}" style="display: none;">
+				<select id="complaintType${orre.id}">
+					<option value="未分类">未分类</option>
+					<option value="A">A</option>
+					<option value="B">B</option>
+					<option value="C">C</option>
+					<option value="D">D</option>
+					<option value="E">E</option>
+				</select>
+				<script type="text/javascript">
+					document.getElementById("complaintType${orre.id}").value='${orre.complaintType}';
+				</script>
+				<br/>
+				<a href="#" onclick="return saveComplaintType(${orre.id})">保存</a>
+			</div>
+		</td>
 		<td><p style="max-width: 100px; overflow: hidden;"><c:out value="${orre.matchesClientPortRelationship.companyName }"></c:out></p></td>
 		<td><c:out value="${orre.matchesClientPortRelationship.companyShortName }"></c:out></td>
 	</tr>
 	</c:forEach>
 </tbody>
 </table>
-
+<script type="text/javascript" src="${ctx}/js/jquery-3.2.1.min.js"></script>
+<script type="text/javascript">
+function editDistContent(orreId) {
+	$("#editDistContent" + orreId).hide();
+	$("#textarea" + orreId).show();
+	return false;
+}
+function saveDistContent(orreId) {
+	$.post(
+		"${ctx}/orre/savedc",
+		{
+			distContent: $("#distContent" + orreId).val(),
+			id: orreId,
+			v: new Date().getTime()
+		},
+		function(data) {
+			var json = JSON.parse(data);
+			if (json.code !== "OK") {
+				alert("Failed to save.")
+			} else {
+				$("#editDistContent" + orreId).show();
+				$("#textarea" + orreId).hide();
+				var textContent = $("#distContent" + orreId).val();
+				if (/^\s*$/.test(textContent)) {
+					textContent = "未填写";
+				}
+				$("#distContentDisp" + orreId).text(textContent);
+			}
+		}
+	);
+	return false;
+}
+function editComplaintType(orreId) {
+	$("#editComplaintType" + orreId).hide();
+	$("#select" + orreId).show();
+	return false;
+}
+function saveComplaintType(orreId) {
+	$.post(
+		"${ctx}/orre/savect",
+		{
+			complaintType: $("#complaintType" + orreId).val(),
+			id: orreId,
+			v: new Date().getTime()
+		},
+		function(data) {
+			var json = JSON.parse(data);
+			if (json.code !== "OK") {
+				alert("Failed to save.")
+			} else {
+				$("#editComplaintType" + orreId).show();
+				$("#select" + orreId).hide();
+				var textContent = $("#complaintType" + orreId).val();
+				$("#complaintTypeDisp" + orreId).text(textContent);
+			}
+		}
+	);
+	return false;
+}
+</script>
 </body>
 </html>
