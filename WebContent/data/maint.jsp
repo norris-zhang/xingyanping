@@ -109,7 +109,7 @@ request.setAttribute("ctx", request.getContextPath());
 			</div>
 			</div>
 		</td>
-		<td><div><c:out value="${orre.matchesClientPortRelationship.companyName }"></c:out></div></td>
+		<td><div><c:out value="${orre.matchesClientPortRelationship.client }"></c:out></div></td>
 		<td><div><c:out value="${orre.matchesClientPortRelationship.companyShortName }"></c:out></div></td>
 	</tr>
 	</c:forEach>
