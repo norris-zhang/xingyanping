@@ -99,7 +99,6 @@ public class OriginalReportDao extends BaseDao {
 						latestFileDate = orre.getReportDate();
 					}
 				} catch (MySQLIntegrityConstraintViolationException e) {
-					System.err.println(e.getMessage());
 					if (!e.getMessage().contains("orre_server_request_identifier_UNIQUE")) {
 						throw e;
 					}
