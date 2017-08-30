@@ -11,11 +11,13 @@ request.setAttribute("ctx", request.getContextPath());
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Insert title here</title>
+<link rel="stylesheet/less" type="text/css" href="${ctx}/css/fixed-table-header.less" />
+<script src="//cdnjs.cloudflare.com/ajax/libs/less.js/2.7.2/less.min.js"></script>
 </head>
 <body>
 <jsp:include page="/segments/header.jsp"></jsp:include>
 <hr/>
-<table border="1">
+<table class="fixed_headers" border="1">
 <thead>
 	<tr>
 		<th>A</th>
@@ -34,39 +36,40 @@ request.setAttribute("ctx", request.getContextPath());
 		<th>N</th>
 		<th>O</th>
 	</tr>
+	<tr>
+		<th>服务请求标识</th>
+		<th>举报手机号码</th>
+		<th>举报受理省</th>
+		<th>用户举报时间</th>
+		<th>被举报号码/网站地址</th>
+		<th>被举报号码归属省</th>
+		<th>归属地市</th>
+		<th>服务请求类别</th>
+		<th>业务平台名称</th>
+		<th>举报对象类型</th>
+		<th>举报内容</th>
+		<th>下发内容</th>
+		<th>投诉类别</th>
+		<th>所属客户</th>
+		<th>简称</th>
+	</tr>
 </thead>
 <tbody>
-	<tr>
-		<td>服务请求标识</td>
-		<td>举报手机号码</td>
-		<td style="width: 50px;">举报受理省</td>
-		<td>用户举报时间</td>
-		<td>被举报号码/网站地址</td>
-		<td style="width: 50px;">被举报号码归属省</td>
-		<td style="width: 50px;">归属地市</td>
-		<td>服务请求类别</td>
-		<td>业务平台名称</td>
-		<td>举报对象类型</td>
-		<td>举报内容</td>
-		<td>下发内容</td>
-		<td>投诉类别</td>
-		<td>所属客户</td>
-		<td>简称</td>
-	</tr>
 	<c:forEach items="${orreList }" var="orre" varStatus="vs">
 	<tr>
-		<td><c:out value="${orre.serverRequestIdentifier }"></c:out></td>
-		<td><c:out value="${orre.reportMobileNumber }"></c:out></td>
-		<td><c:out value="${orre.reportProvince }"></c:out></td>
-		<td><fmt:formatDate value="${orre.reportDate }" pattern="yyyy-MM-dd"/></td>
-		<td><c:out value="${orre.reportedNumber }"></c:out></td>
-		<td><c:out value="${orre.reportedProvince }"></c:out></td>
-		<td><c:out value="${orre.reportedCity }"></c:out></td>
-		<td><c:out value="${orre.serverRequestType }"></c:out></td>
-		<td><p style="max-width: 250px;"><c:out value="${orre.bizPlatform }"></c:out></p></td>
-		<td><c:out value="${orre.reportObjectType }"></c:out></td>
-		<td><p style="max-width: 350px; overflow: hidden;"><c:out value="${orre.reportContent }"></c:out></p></td>
-		<td style="max-width: 100px;">
+		<td><div><c:out value="${orre.serverRequestIdentifier }"></c:out></div></td>
+		<td><div><c:out value="${orre.reportMobileNumber }"></c:out></div></td>
+		<td><div><c:out value="${orre.reportProvince }"></c:out></div></td>
+		<td><div><fmt:formatDate value="${orre.reportDate }" pattern="yyyy-MM-dd"/></div></td>
+		<td><div><c:out value="${orre.reportedNumber }"></c:out></div></td>
+		<td><div><c:out value="${orre.reportedProvince }"></c:out></div></td>
+		<td><div><c:out value="${orre.reportedCity }"></c:out></div></td>
+		<td><div><c:out value="${orre.serverRequestType }"></c:out></div></td>
+		<td><div><c:out value="${orre.bizPlatform }"></c:out></div></td>
+		<td><div><c:out value="${orre.reportObjectType }"></c:out></div></td>
+		<td><div><c:out value="${orre.reportContent }"></c:out></div></td>
+		<td>
+			<div>
 			<div id="editDistContent${orre.id}">
 				<div id="distContentDisp${orre.id}">
 					<c:choose>
@@ -77,12 +80,14 @@ request.setAttribute("ctx", request.getContextPath());
 				<br/><a href="#" onclick="return editDistContent(${orre.id})">修改</a>
 			</div>
 			<div id="textarea${orre.id}" style="display: none;">
-				<textarea id="distContent${orre.id}" style="width: 95px;" rows="5">${orre.distContent }</textarea>
+				<textarea id="distContent${orre.id}" style="width: 98%;" rows="2">${orre.distContent }</textarea>
 				<br/>
 				<a href="#" onclick="return saveDistContent(${orre.id})">保存</a>
 			</div>
+			</div>
 		</td>
 		<td>
+			<div>
 			<div id="editComplaintType${orre.id}">
 				<div id="complaintTypeDisp${orre.id}"><c:out value="${orre.complaintType }"></c:out></div>
 				<br/><a href="#" onclick="return editComplaintType(${orre.id})">修改</a>
@@ -102,9 +107,10 @@ request.setAttribute("ctx", request.getContextPath());
 				<br/>
 				<a href="#" onclick="return saveComplaintType(${orre.id})">保存</a>
 			</div>
+			</div>
 		</td>
-		<td><p style="max-width: 100px; overflow: hidden;"><c:out value="${orre.matchesClientPortRelationship.companyName }"></c:out></p></td>
-		<td><c:out value="${orre.matchesClientPortRelationship.companyShortName }"></c:out></td>
+		<td><div><c:out value="${orre.matchesClientPortRelationship.companyName }"></c:out></div></td>
+		<td><div><c:out value="${orre.matchesClientPortRelationship.companyShortName }"></c:out></div></td>
 	</tr>
 	</c:forEach>
 </tbody>

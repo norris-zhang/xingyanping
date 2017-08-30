@@ -1,6 +1,10 @@
 package com.xingyanping.web;
 
+import static com.xingyanping.util.MatchClientUtil.NOT_MATCH;
+import static com.xingyanping.util.MatchClientUtil.matchClient;
+
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -14,7 +18,6 @@ import com.xingyanping.dao.OriginalReportViewCondition;
 import com.xingyanping.dao.OriginalReportViewDao;
 import com.xingyanping.datamodel.ClientPortRelationship;
 import com.xingyanping.datamodel.OriginalReport;
-import com.xingyanping.util.MatchClientUtil;
 
 /**
  * Servlet implementation class ViewOriginalReportServlet
@@ -39,8 +42,12 @@ public class ViewOriginalReportServlet extends HttpServlet {
 			String range = request.getParameter("r");
 			List<OriginalReport> orreList = new OriginalReportViewDao().retrieve(new OriginalReportViewCondition(id, range));
 			List<ClientPortRelationship> cprsList = new ClientPortRelationshipDao().retrieveAll();
-			for (OriginalReport orre : orreList) {
-				MatchClientUtil.matchClient(orre, cprsList);
+			for (Iterator<OriginalReport> iter = orreList.iterator(); iter.hasNext();) {
+				OriginalReport orre = iter.next();
+				String matchClient = matchClient(orre, cprsList);
+				if (NOT_MATCH.equals(matchClient)) {
+					iter.remove();
+				}
 			}
 			request.setAttribute("orreList", orreList);
 			request.getRequestDispatcher("/data/maint.jsp").forward(request, response);
