@@ -72,7 +72,7 @@ List<UploadedFile> uploadedFiles = new UploadedFileDao().retrieve();
 			<a href="${ctx}/orre/view?id=<%= file.getId() %>&r=m">查看当月数据</a>
 		</td>
 		<td>
-			<a href="#">导出当月数据</a>
+			<a href="${ctx}/dl/exportmonth?id=<%= file.getId() %>">导出当月数据</a>
 		</td>
 	</tr>
 	<% } %>
