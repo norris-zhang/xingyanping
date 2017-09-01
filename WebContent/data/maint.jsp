@@ -130,8 +130,7 @@ function saveDistContent(orreId) {
 			id: orreId,
 			v: new Date().getTime()
 		},
-		function(data) {
-			var json = JSON.parse(data);
+		function(json) {
 			if (json.code !== "OK") {
 				alert("Failed to save.")
 			} else {
@@ -144,7 +143,10 @@ function saveDistContent(orreId) {
 				$("#distContentDisp" + orreId).text(textContent);
 			}
 		}
-	);
+	)
+	.fail(function(){
+		alert("Failed to save");
+	});
 	return false;
 }
 function editComplaintType(orreId) {
@@ -160,8 +162,7 @@ function saveComplaintType(orreId) {
 			id: orreId,
 			v: new Date().getTime()
 		},
-		function(data) {
-			var json = JSON.parse(data);
+		function(json) {
 			if (json.code !== "OK") {
 				alert("Failed to save.")
 			} else {
@@ -171,7 +172,10 @@ function saveComplaintType(orreId) {
 				$("#complaintTypeDisp" + orreId).text(textContent);
 			}
 		}
-	);
+	)
+	.fail(function(){
+		alert("Failed to save");
+	});
 	return false;
 }
 </script>
