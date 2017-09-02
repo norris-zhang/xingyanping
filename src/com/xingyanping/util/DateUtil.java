@@ -1,5 +1,12 @@
 package com.xingyanping.util;
 
+import static java.util.Calendar.DATE;
+import static java.util.Calendar.HOUR_OF_DAY;
+import static java.util.Calendar.MILLISECOND;
+import static java.util.Calendar.MINUTE;
+import static java.util.Calendar.MONTH;
+import static java.util.Calendar.SECOND;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -43,4 +50,39 @@ public class DateUtil {
 		return c.getTime();
 	}
 
+	public static Date getMonthStart(Date date) {
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		c.set(DATE, 1);
+		c.set(HOUR_OF_DAY, 0);
+		c.set(MINUTE, 0);
+		c.set(SECOND, 0);
+		c.set(MILLISECOND, 0);
+		return c.getTime();
+	}
+	
+	public static Date getMonthEnd(Date date) {
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		c.set(DATE, 1);
+		c.set(HOUR_OF_DAY, 0);
+		c.set(MINUTE, 0);
+		c.set(SECOND, 0);
+		c.set(MILLISECOND, 0);
+		c.add(MONTH, 1);
+		c.add(SECOND, -1);
+		return c.getTime();
+	}
+
+	public static int getDate(Date date) {
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		return c.get(DATE);
+	}
+
+	public static int getMonth(Date date) {
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		return c.get(MONTH) + 1;
+	}
 }

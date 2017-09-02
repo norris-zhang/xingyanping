@@ -30,6 +30,7 @@ public class SaveOrreDistContentServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		response.setContentType("application/json");
 		PrintWriter out = response.getWriter();
 		try {
 			String distContent = request.getParameter("distContent");

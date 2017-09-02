@@ -10,6 +10,10 @@ request.setAttribute("ctx", request.getContextPath());
 <title>Insert title here</title>
 </head>
 <body>
-<h1>It works!</h1>
+<jsp:include page="/segments/header.jsp"></jsp:include>
+<hr/>
+<div>
+aaa
+</div>
 </body>
 </html>
