@@ -10,11 +10,14 @@ request.setAttribute("ctx", request.getContextPath());
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Insert title here</title>
+<link rel="stylesheet" type="text/css" href="${ctx}/css/main.css" />
 </head>
 <body>
 <jsp:include page="/segments/header.jsp"></jsp:include>
 <hr/>
-<jsp:include page="/stat/segments/statnav.jsp"></jsp:include>
+<jsp:include page="/stat/segments/statnav.jsp">
+	<jsp:param value="byclient" name="activeLink"/>
+</jsp:include>
 <hr/>
 <jsp:include page="/stat/segments/statmonth.jsp">
 	<jsp:param value="byclient" name="statType"/>

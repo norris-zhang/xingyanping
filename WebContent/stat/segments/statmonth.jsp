@@ -7,7 +7,7 @@ request.setAttribute("statType", request.getParameter("statType"));
 %>
 <div>
 <c:forEach items="${monthListVo.montVoList}" var="monthVo">
-<a href="${ctx}/stat/${statType}?m=${monthVo.monthParam}">${monthVo.monthDisp }</a>
+<a href="${ctx}/stat/${statType}?m=${monthVo.monthParam}" <c:if test="${month == monthVo.monthNumber}">class="active-link"</c:if>>${monthVo.monthDisp }</a>
 &nbsp;&nbsp;
 </c:forEach>
 </div>
