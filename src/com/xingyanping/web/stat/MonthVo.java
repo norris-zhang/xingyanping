@@ -3,6 +3,8 @@ package com.xingyanping.web.stat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.xingyanping.util.DateUtil;
+
 public class MonthVo {
 	private Date monthDate;
 	private String pattern;
@@ -15,5 +17,8 @@ public class MonthVo {
 	}
 	public String getMonthParam() {
 		return new SimpleDateFormat("yyyyMM").format(monthDate);
+	}
+	public int getMonthNumber() {
+		return DateUtil.getMonth(monthDate);
 	}
 }
