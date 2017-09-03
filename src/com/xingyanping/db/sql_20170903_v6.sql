@@ -14,7 +14,7 @@ update `client_port_relationship` set `cprs_order`=10 where `cprs_company_short_
 update `client_port_relationship` set `cprs_order`=11 where `cprs_company_short_name`='企业银行';
 update `client_port_relationship` set `cprs_order`=12 where `cprs_company_short_name`='济南百秀';
 update `client_port_relationship` set `cprs_order`=13 where `cprs_company_short_name`='陕西上格';
-update `client_port_relationship` set `cprs_order`=14 where `cprs_company_short_name`='陕西创远' and `cprs_port`='106575681025%';
+update `client_port_relationship` set `cprs_order`=14 where `cprs_company_short_name`='陕西创远' and `cprs_port` like '106575681025%';
 update `client_port_relationship` set `cprs_order`=15 where `cprs_company_short_name`='创力天行';
 update `client_port_relationship` set `cprs_order`=16 where `cprs_company_short_name`='西安锦诚';
 update `client_port_relationship` set `cprs_order`=17 where `cprs_company_short_name`='陕西世荣';

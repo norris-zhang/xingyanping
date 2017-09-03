@@ -26,7 +26,7 @@ public class StatByClientDao extends BaseDao{
 		
 		try {
 			conn = ConnectionFactory.getConnection();
-			String sql = "select * from original_report where orre_report_date >= ? and orre_report_date <= ?";
+			String sql = "select * from original_report where upper(orre_complaint_type)<>'A' and orre_report_date >= ? and orre_report_date <= ?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setTimestamp(1, new Timestamp(getMonthStart(monthDate).getTime()));
 			pstmt.setTimestamp(2, new Timestamp(getMonthEnd(monthDate).getTime()));
