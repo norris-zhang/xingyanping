@@ -29,19 +29,8 @@ public class ClientPortRelationshipDao extends BaseDao {
 			rs = pstmt.executeQuery();
 			while (rs.next()) {
 				ClientPortRelationship cprs = new ClientPortRelationship();
-				
-				cprs.setId(rs.getLong("cprs_id"));
-				cprs.setPort(rs.getString("cprs_port"));
-				cprs.setCompanyName(rs.getString("cprs_company_name"));
-				cprs.setCompanyShortName(rs.getString("cprs_company_short_name"));
-				cprs.setClient(rs.getString("cprs_client"));
-				cprs.setUpdated(new Date(rs.getTimestamp("cprs_updated").getTime()));
-				cprs.setEffectiveDate(new Date(rs.getTimestamp("cprs_effective_date").getTime()));
-				Timestamp expiringDate = rs.getTimestamp("cprs_expiring_date");
-				if (expiringDate != null) {
-					cprs.setExpiringDate(new Date(expiringDate.getTime()));
-				}
-				
+				cprs.populate(rs);
+
 				cprsList.add(cprs);
 			}
 			

@@ -29,7 +29,6 @@ request.setAttribute("ctx", request.getContextPath());
 <thead>
 	<tr>
 		<th>简称</th>
-		<th>端口号</th>
 		<th>累计</th>
 		<% StatByChannelDto dto = (StatByChannelDto)request.getAttribute("dto"); %>
 		<% for (int i = dto.getMaxDate(); i >= dto.getMinDate(); i--) { %>
@@ -41,7 +40,6 @@ request.setAttribute("ctx", request.getContextPath());
 	<c:forEach items="${dto.clientStatMap}" var="clientStat">
 		<tr>
 			<td>${fn:split(clientStat.key, ':')[0]}</td>
-			<td>${fn:split(clientStat.key, ':')[1]}</td>
 			<c:forEach items="${clientStat.value}" var="dateCount">
 			<td>${dateCount}</td>
 			</c:forEach>
