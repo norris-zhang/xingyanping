@@ -2,11 +2,16 @@ package com.xingyanping.dao;
 
 import static com.xingyanping.util.DateUtil.getDate;
 
+import java.text.CollationKey;
+import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TreeMap;
 
 import com.xingyanping.datamodel.ClientPortRelationship;
 import com.xingyanping.datamodel.OriginalReport;
@@ -81,9 +86,20 @@ public class StatByClientDto {
 			}
 		}
 		
-		clientStatMap = new HashMap<>();
+		clientStatMap = new TreeMap<>(new Comparator<String>() {
+			private Collator collator = Collator.getInstance(Locale.SIMPLIFIED_CHINESE);
+			@Override
+			public int compare(String o1, String o2) {
+				CollationKey key1 = collator.getCollationKey(o1);
+				CollationKey key2 = collator.getCollationKey(o2);
+				return key1.compareTo(key2);
+			}
+		});
 		for (ClientPortRelationship cprs : cprsList) {
-			clientStatMap.put(cprs.getClient(), calculateClientStat(cprs, reportCountMap));
+			List<Integer> clientCount = calculateClientStat(cprs, reportCountMap);
+			if (clientCount.get(0) > 0) {
+				clientStatMap.put(cprs.getClient(), clientCount);
+			}
 		}
 		
 		return this;

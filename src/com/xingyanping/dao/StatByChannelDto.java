@@ -3,10 +3,12 @@ package com.xingyanping.dao;
 import static com.xingyanping.util.DateUtil.getDate;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import com.xingyanping.datamodel.ClientPortRelationship;
 import com.xingyanping.datamodel.OriginalReport;
@@ -81,7 +83,14 @@ public class StatByChannelDto {
 			}
 		}
 		
-		clientStatMap = new HashMap<>();
+		clientStatMap = new TreeMap<>(new Comparator<String>() {
+			@Override
+			public int compare(String o1, String o2) {
+				int order1 = Integer.parseInt(o1.split(":")[1]);
+				int order2 = Integer.parseInt(o2.split(":")[1]);
+				return order1 - order2;
+			}
+		});
 		for (ClientPortRelationship cprs : cprsList) {
 			clientStatMap.put(generateChannelKey(cprs), calculateChannelStat(cprs, reportCountMap));
 		}
@@ -90,7 +99,7 @@ public class StatByChannelDto {
 	}
 
 	private String generateChannelKey(ClientPortRelationship cprs) {
-		return cprs.getCompanyShortName() + ":" + cprs.getPort();
+		return cprs.getCompanyShortName() + ":" + cprs.getOrder();
 	}
 
 	private List<Integer> calculateChannelStat(ClientPortRelationship cprs,
