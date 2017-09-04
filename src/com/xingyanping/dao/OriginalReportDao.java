@@ -89,7 +89,11 @@ public class OriginalReportDao extends BaseDao {
 				//14. `orre_dist_content`
 				pstmt.setString(14, null);
 				//15. `orre_complaint_type`
-				pstmt.setString(15, "未分类");
+				if (orre.getReportContent() != null && orre.getReportContent().contains("验证")) {
+					pstmt.setString(15, "A");
+				} else {
+					pstmt.setString(15, "未分类");
+				}
 
 				try {
 					pstmt.executeUpdate();
