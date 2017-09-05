@@ -1,8 +1,11 @@
 package com.xingyanping.web;
 
+import static com.xingyanping.util.DateUtil.isSameDate;
+
 import java.io.IOException;
 import java.text.CollationKey;
 import java.text.Collator;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -44,7 +47,7 @@ public class ViewOriginalReportServlet extends HttpServlet {
 			List<ClientPortRelationship> cprsList = new ClientPortRelationshipDao().retrieveAll();
 			new ClientFiller(orreList, cprsList, true).execute();
 			
-			sortByClient(orreList);
+			sortByDateClient(orreList);
 
 			request.setAttribute("orreList", orreList);
 			request.getRequestDispatcher("/data/maint.jsp").forward(request, response);
@@ -53,9 +56,15 @@ public class ViewOriginalReportServlet extends HttpServlet {
 		}
 	}
 
-	private void sortByClient(List<OriginalReport> orreList) {
+	private void sortByDateClient(List<OriginalReport> orreList) {
 		final Collator collator = Collator.getInstance(Locale.SIMPLIFIED_CHINESE);
 		orreList.sort((o1, o2) -> {
+			Date reportDate1 = o1.getReportDate();
+			Date reportDate2 = o2.getReportDate();
+			if (!isSameDate(reportDate1, reportDate2)) {
+				return reportDate1.compareTo(reportDate2);
+			}
+			
 			ClientPortRelationship cprs1 = o1.getMatchesClientPortRelationship();
 			ClientPortRelationship cprs2 = o2.getMatchesClientPortRelationship();
 			if (cprs1 == null) {
