@@ -6,6 +6,7 @@ import static java.util.Calendar.MILLISECOND;
 import static java.util.Calendar.MINUTE;
 import static java.util.Calendar.MONTH;
 import static java.util.Calendar.SECOND;
+import static java.util.Calendar.YEAR;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -84,5 +85,16 @@ public class DateUtil {
 		Calendar c = Calendar.getInstance();
 		c.setTime(date);
 		return c.get(MONTH) + 1;
+	}
+
+	public static boolean isSameDate(Date date1, Date date2) {
+		Calendar c1 = Calendar.getInstance();
+		Calendar c2 = Calendar.getInstance();
+		c1.setTime(date1);
+		c2.setTime(date2);
+		
+		return c1.get(YEAR) == c2.get(YEAR)
+				&& c1.get(MONTH) == c2.get(MONTH)
+				&& c1.get(DATE) == c2.get(DATE);
 	}
 }
