@@ -11,8 +11,89 @@ request.setAttribute("ctx", request.getContextPath());
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Insert title here</title>
+<link rel="stylesheet" type="text/css" href="${ctx}/css/main.css" />
 <link rel="stylesheet/less" type="text/css" href="${ctx}/css/fixed-table-header.less" />
 <script src="//cdnjs.cloudflare.com/ajax/libs/less.js/2.7.2/less.min.js"></script>
+
+<script type="text/javascript" src="${ctx}/js/jquery-3.2.1.min.js"></script>
+<script type="text/javascript">
+function editDistContent(orreId) {
+	$("#editDistContent" + orreId).hide();
+	$("#textarea" + orreId).show();
+	return false;
+}
+function saveDistContent(orreId) {
+	$.post(
+		"${ctx}/orre/savedc",
+		{
+			distContent: $("#distContent" + orreId).val(),
+			id: orreId,
+			v: new Date().getTime()
+		},
+		function(json) {
+			if (json.code !== "OK") {
+				alert("Failed to save.")
+			} else {
+				$("#editDistContent" + orreId).show();
+				$("#textarea" + orreId).hide();
+				var textContent = $("#distContent" + orreId).val();
+				if (/^\s*$/.test(textContent)) {
+					textContent = "未填写";
+				}
+				$("#distContentDisp" + orreId).text(textContent);
+				if (textContent === '无下发记录' || textContent === '重复投诉') {
+					$("#distContentDisp" + orreId).addClass("red-text");
+				} else {
+					$("#distContentDisp" + orreId).removeClass("red-text");
+				}
+			}
+		}
+	)
+	.fail(function(){
+		alert("Failed to save");
+	});
+	return false;
+}
+function editComplaintType(orreId) {
+	$("#editComplaintType" + orreId).hide();
+	$("#select" + orreId).show();
+	return false;
+}
+function saveComplaintType(orreId) {
+	$.post(
+		"${ctx}/orre/savect",
+		{
+			complaintType: $("#complaintType" + orreId).val(),
+			id: orreId,
+			v: new Date().getTime()
+		},
+		function(json) {
+			if (json.code !== "OK") {
+				alert("Failed to save.")
+			} else {
+				$("#editComplaintType" + orreId).show();
+				$("#select" + orreId).hide();
+				var textContent = $("#complaintType" + orreId).val();
+				$("#complaintTypeDisp" + orreId).text(textContent);
+			}
+		}
+	)
+	.fail(function(){
+		alert("Failed to save");
+	});
+	return false;
+}
+function setDistContent(orreId, content) {
+	$("#distContent" + orreId).val(content);
+	saveDistContent(orreId);
+}
+function copyDistContent(orreId) {
+	var reportContent = $("#reportContent" + orreId).text();
+	$("#distContent" + orreId).val(reportContent);
+	saveDistContent(orreId);
+	return false;
+}
+</script>
 </head>
 <body>
 <jsp:include page="/segments/header.jsp"></jsp:include>
@@ -67,20 +148,23 @@ request.setAttribute("ctx", request.getContextPath());
 		<td><div><c:out value="${orre.serverRequestType }"></c:out></div></td>
 		<td><div><c:out value="${orre.bizPlatform }"></c:out></div></td>
 		<td><div><c:out value="${orre.reportObjectType }"></c:out></div></td>
-		<td><div><c:out value="${orre.reportContent }"></c:out></div></td>
+		<td><div id="reportContent${orre.id}"><c:out value="${orre.reportContent }"></c:out></div></td>
 		<td>
 			<div>
 			<div id="editDistContent${orre.id}">
-				<div id="distContentDisp${orre.id}">
+				<div id="distContentDisp${orre.id}" <c:if test="${orre.distContent == '无下发记录' || orre.distContent == '重复投诉'}">class="red-text"</c:if>>
 					<c:choose>
 						<c:when test="${empty fn:trim(orre.distContent) }">未填写</c:when>
 						<c:otherwise><c:out value="${orre.distContent }"></c:out></c:otherwise>
 					</c:choose>
 				</div>
 				<br/><a href="#" onclick="return editDistContent(${orre.id})">修改</a>
+				&nbsp;<a href="#" onclick="return setDistContent(${orre.id}, '无下发记录')">无下发记录</a>
+				&nbsp;<a href="#" onclick="return setDistContent(${orre.id}, '重复投诉')">重复</a>
+				&nbsp;<a href="#" onclick="return copyDistContent(${orre.id})">复制</a>
 			</div>
 			<div id="textarea${orre.id}" style="display: none;">
-				<textarea id="distContent${orre.id}" style="width: 98%;" rows="2">${orre.distContent }</textarea>
+				<textarea id="distContent${orre.id}" style="width: 98%;" rows="6">${orre.distContent }</textarea>
 				<br/>
 				<a href="#" onclick="return saveDistContent(${orre.id})">保存</a>
 			</div>
@@ -115,69 +199,5 @@ request.setAttribute("ctx", request.getContextPath());
 	</c:forEach>
 </tbody>
 </table>
-<script type="text/javascript" src="${ctx}/js/jquery-3.2.1.min.js"></script>
-<script type="text/javascript">
-function editDistContent(orreId) {
-	$("#editDistContent" + orreId).hide();
-	$("#textarea" + orreId).show();
-	return false;
-}
-function saveDistContent(orreId) {
-	$.post(
-		"${ctx}/orre/savedc",
-		{
-			distContent: $("#distContent" + orreId).val(),
-			id: orreId,
-			v: new Date().getTime()
-		},
-		function(json) {
-			if (json.code !== "OK") {
-				alert("Failed to save.")
-			} else {
-				$("#editDistContent" + orreId).show();
-				$("#textarea" + orreId).hide();
-				var textContent = $("#distContent" + orreId).val();
-				if (/^\s*$/.test(textContent)) {
-					textContent = "未填写";
-				}
-				$("#distContentDisp" + orreId).text(textContent);
-			}
-		}
-	)
-	.fail(function(){
-		alert("Failed to save");
-	});
-	return false;
-}
-function editComplaintType(orreId) {
-	$("#editComplaintType" + orreId).hide();
-	$("#select" + orreId).show();
-	return false;
-}
-function saveComplaintType(orreId) {
-	$.post(
-		"${ctx}/orre/savect",
-		{
-			complaintType: $("#complaintType" + orreId).val(),
-			id: orreId,
-			v: new Date().getTime()
-		},
-		function(json) {
-			if (json.code !== "OK") {
-				alert("Failed to save.")
-			} else {
-				$("#editComplaintType" + orreId).show();
-				$("#select" + orreId).hide();
-				var textContent = $("#complaintType" + orreId).val();
-				$("#complaintTypeDisp" + orreId).text(textContent);
-			}
-		}
-	)
-	.fail(function(){
-		alert("Failed to save");
-	});
-	return false;
-}
-</script>
 </body>
 </html>
