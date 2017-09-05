@@ -1,7 +1,10 @@
 package com.xingyanping.web;
 
 import java.io.IOException;
+import java.text.CollationKey;
+import java.text.Collator;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -40,12 +43,31 @@ public class ViewOriginalReportServlet extends HttpServlet {
 			List<OriginalReport> orreList = new OriginalReportViewDao().retrieve(new OriginalReportViewCondition(id, range));
 			List<ClientPortRelationship> cprsList = new ClientPortRelationshipDao().retrieveAll();
 			new ClientFiller(orreList, cprsList, true).execute();
+			
+			sortByClient(orreList);
 
 			request.setAttribute("orreList", orreList);
 			request.getRequestDispatcher("/data/maint.jsp").forward(request, response);
 		} catch (Exception e) {
 			throw new ServletException(e);
 		}
+	}
+
+	private void sortByClient(List<OriginalReport> orreList) {
+		final Collator collator = Collator.getInstance(Locale.SIMPLIFIED_CHINESE);
+		orreList.sort((o1, o2) -> {
+			ClientPortRelationship cprs1 = o1.getMatchesClientPortRelationship();
+			ClientPortRelationship cprs2 = o2.getMatchesClientPortRelationship();
+			if (cprs1 == null) {
+				return 1;
+			}
+			if (cprs2 == null) {
+				return -1;
+			}
+			CollationKey key1 = collator.getCollationKey(cprs1.getClient());
+			CollationKey key2 = collator.getCollationKey(cprs2.getClient());
+			return key1.compareTo(key2);
+		});
 	}
 
 }
