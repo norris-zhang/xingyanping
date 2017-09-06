@@ -64,6 +64,7 @@ List<UploadedFile> uploadedFiles = new UploadedFileDao().retrieve();
 		<td><%= file.getOriginalReportCount() %></td>
 		<td>
 			<a href="${ctx}/dl/blacklist?id=<%= file.getId() %>">下载黑名单</a><br/>
+			<a href="${ctx}/dl/blacklist/gongyi?id=<%= file.getId() %>">下载公益通道黑名单</a><br/>
 			<a href="${ctx}/dl/monthlycomplaint?id=<%= file.getId() %>">下载当月投诉数据</a><br/>
 			<a href="${ctx}/file/delete?id=<%= file.getId() %>" onclick="return confirmDelete()">删除文件</a>
 		</td>

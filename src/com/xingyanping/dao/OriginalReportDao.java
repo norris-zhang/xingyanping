@@ -257,25 +257,8 @@ public class OriginalReportDao extends BaseDao {
 			rs = pstmt.executeQuery();
 			while (rs.next()) {
 				OriginalReport orre = new OriginalReport();
-				orre.setId(rs.getLong("orre_id"));
-				orre.setFromFileId(rs.getLong("orre_from_file_id"));
-				orre.setServerRequestIdentifier(rs.getString("orre_server_request_identifier"));
-				orre.setReportMobileNumber(rs.getString("orre_report_mobile_number"));
-				orre.setReportProvince(rs.getString("orre_report_province"));
-				Timestamp reportDate = rs.getTimestamp("orre_report_date");
-				if (reportDate != null) {
-					orre.setReportDate(new Date(reportDate.getTime()));
-				}
-				orre.setReportedNumber(rs.getString("orre_reported_number"));
-				orre.setReportedProvince(rs.getString("orre_reported_province"));
-				orre.setReportedCity(rs.getString("orre_reported_city"));
-				orre.setServerRequestType(rs.getString("orre_server_request_type"));
-				orre.setBizPlatform(rs.getString("orre_biz_platform"));
-				orre.setReportObjectType(rs.getString("orre_report_object_type"));
-				orre.setReportContent(rs.getString("orre_report_content"));
-				orre.setYearMonth(rs.getString("orre_year_month"));
-				orre.setUpdated(new Date(rs.getTimestamp("orre_updated").getTime()));
-				
+				orre.populate(rs);
+
 				orreList.add(orre);
 			}
 			
