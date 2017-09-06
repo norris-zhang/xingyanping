@@ -31,10 +31,14 @@ public class DateUtil {
 	}
 	
 	public static String formatDate(Date date) {
+		return formatDate(date, "yyyy-MM-dd");
+	}
+	
+	public static String formatDate(Date date, String pattern) {
 		if (date == null) {
 			return "";
 		}
-		return new SimpleDateFormat("yyyy-MM-dd").format(date);
+		return new SimpleDateFormat(pattern).format(date);
 	}
 
 	public static Date parseDateToEnd(String dateString) throws ParseException {
