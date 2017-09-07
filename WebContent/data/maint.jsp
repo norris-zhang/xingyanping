@@ -10,11 +10,8 @@ request.setAttribute("ctx", request.getContextPath());
 <html>
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link rel="stylesheet" href="${ctx}/bootstrap/css/bootstrap.min.css">
-
 <title>Insert title here</title>
-<link rel="stylesheet" type="text/css" href="${ctx}/css/main.css" />
+<link rel="stylesheet" type="text/css" href="${ctx}/css/main.css?v=1" />
 <link rel="stylesheet/less" type="text/css" href="${ctx}/css/fixed-table-header.less" />
 <script src="//cdnjs.cloudflare.com/ajax/libs/less.js/2.7.2/less.min.js"></script>
 
@@ -140,11 +137,11 @@ $(document).ready(function(){
 <jsp:include page="/segments/header.jsp"></jsp:include>
 <hr/>
 <div id="typeOptions" data-orreid="" style="position: absolute; z-index: 10; display: none;">
-<button type="button" class="btn btn-primary btn-sm" data-ctype="A">A</button>
-<button type="button" class="btn btn-primary btn-sm" data-ctype="B">B</button>
-<button type="button" class="btn btn-primary btn-sm" data-ctype="C">C</button>
-<button type="button" class="btn btn-primary btn-sm" data-ctype="D">D</button>
-<button type="button" class="btn btn-primary btn-sm" data-ctype="E">E</button>
+<button type="button" class="btn btn-primary" data-ctype="A">A</button>
+<button type="button" class="btn btn-primary" data-ctype="B">B</button>
+<button type="button" class="btn btn-primary" data-ctype="C">C</button>
+<button type="button" class="btn btn-primary" data-ctype="D">D</button>
+<button type="button" class="btn btn-primary" data-ctype="E">E</button>
 </div>
 <table class="fixed_headers" border="1">
 <thead>
@@ -230,9 +227,6 @@ $(document).ready(function(){
 	</c:forEach>
 </tbody>
 </table>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
-<script src="${ctx}/bootstrap/js/bootstrap.min.js"></script>
 
 </body>
 </html>
