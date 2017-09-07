@@ -2,6 +2,7 @@ package com.xingyanping.web;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -12,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.xingyanping.dao.OriginalReportDao;
 import com.xingyanping.util.ZipFileContent;
-import com.xingyanping.util.ZipUtil;
+import com.xingyanping.util.ZipFileEntry;
 
 /**
  * Servlet implementation class DownloadBlacklist
@@ -36,10 +37,16 @@ public class DownloadBlacklist extends HttpServlet {
 		try {
 			Long upfiId = Long.valueOf(request.getParameter("id"));
 			ZipFileContent zipFileContent = originalReportDao.getBlacklist(upfiId);
-			byte[] data = ZipUtil.zip(zipFileContent);
+			
+			List<ZipFileEntry> entryList = zipFileContent.getEntryList();
+			if (entryList == null || entryList.size() != 1) {
+				throw new ServletException("Blacklist file count is not 1");
+			}
+			
+			byte[] data = entryList.get(0).data;
 
-			response.setContentType("application/zip");
-			response.setHeader("Content-disposition", "attachment; filename=blacklist.zip");
+			response.setContentType("text/plain");
+			response.setHeader("Content-disposition", "attachment; filename=blacklist.txt");
 			
 			ServletOutputStream out = response.getOutputStream();
 			out.write(data);
