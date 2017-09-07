@@ -9,7 +9,10 @@ request.setAttribute("ctx", request.getContextPath());
 <!DOCTYPE html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="${ctx}/bootstrap/css/bootstrap.min.css">
+
 <title>Insert title here</title>
 <link rel="stylesheet" type="text/css" href="${ctx}/css/main.css" />
 <link rel="stylesheet/less" type="text/css" href="${ctx}/css/fixed-table-header.less" />
@@ -54,16 +57,44 @@ function saveDistContent(orreId) {
 	});
 	return false;
 }
-function editComplaintType(orreId) {
-	$("#editComplaintType" + orreId).hide();
-	$("#select" + orreId).show();
+
+function editComplaintType(e, orreId) {
+	var eventObj = e.target || e.srcElement;
+	var pos = $(eventObj).offset();
+	var top = pos.top - 30;
+	if (top < 0) {
+		top = 0;
+	}
+	var left = pos.left - 68;
+	if (left < 0) {
+		left = 0;
+	}
+	$("#typeOptions").css({top: top, left: left});
+	$("#typeOptions").data("orreid", orreId);
+	$("#typeOptions").show();
+
+	setActiveButton(orreId);
+
+	e.stopPropagation();
 	return false;
 }
-function saveComplaintType(orreId) {
+function setActiveButton(orreId) {
+	var ctDisp = $("#complaintTypeDisp" + orreId).text();
+	$("#typeOptions button").each(function(index, element) {
+		if (ctDisp === $(element).text()) {
+			$(element).removeClass("btn-primary");
+			$(element).addClass("btn-danger");
+		} else {
+			$(element).removeClass("btn-danger");
+			$(element).addClass("btn-primary");
+		}
+	});
+}
+function saveComplaintType(orreId, complaintType) {
 	$.post(
 		"${ctx}/orre/savect",
 		{
-			complaintType: $("#complaintType" + orreId).val(),
+			complaintType: complaintType,
 			id: orreId,
 			v: new Date().getTime()
 		},
@@ -71,10 +102,8 @@ function saveComplaintType(orreId) {
 			if (json.code !== "OK") {
 				alert("Failed to save.")
 			} else {
-				$("#editComplaintType" + orreId).show();
-				$("#select" + orreId).hide();
-				var textContent = $("#complaintType" + orreId).val();
-				$("#complaintTypeDisp" + orreId).text(textContent);
+				$("#complaintTypeDisp" + orreId).text(complaintType);
+				$("#typeOptions").fadeOut(300);
 			}
 		}
 	)
@@ -93,11 +122,30 @@ function copyDistContent(orreId) {
 	saveDistContent(orreId);
 	return false;
 }
+
+$(document).ready(function(){
+	$(document).click(function(){
+		$("#typeOptions").fadeOut(300);
+	});
+	$("#typeOptions button").click(function(event){
+		var orreId = $("#typeOptions").data("orreid");
+		var complaintType = $(event.target).data("ctype");
+		return saveComplaintType(orreId, complaintType);
+	});
+});
+
 </script>
 </head>
 <body>
 <jsp:include page="/segments/header.jsp"></jsp:include>
 <hr/>
+<div id="typeOptions" data-orreid="" style="position: absolute; z-index: 10; display: none;">
+<button type="button" class="btn btn-primary btn-sm" data-ctype="A">A</button>
+<button type="button" class="btn btn-primary btn-sm" data-ctype="B">B</button>
+<button type="button" class="btn btn-primary btn-sm" data-ctype="C">C</button>
+<button type="button" class="btn btn-primary btn-sm" data-ctype="D">D</button>
+<button type="button" class="btn btn-primary btn-sm" data-ctype="E">E</button>
+</div>
 <table class="fixed_headers" border="1">
 <thead>
 	<tr>
@@ -172,25 +220,8 @@ function copyDistContent(orreId) {
 		</td>
 		<td>
 			<div>
-			<div id="editComplaintType${orre.id}">
 				<div id="complaintTypeDisp${orre.id}"><c:out value="${orre.complaintType }"></c:out></div>
-				<br/><a href="#" onclick="return editComplaintType(${orre.id})">修改</a>
-			</div>
-			<div id="select${orre.id}" style="display: none;">
-				<select id="complaintType${orre.id}">
-					<option value="未分类">未分类</option>
-					<option value="A">A</option>
-					<option value="B">B</option>
-					<option value="C">C</option>
-					<option value="D">D</option>
-					<option value="E">E</option>
-				</select>
-				<script type="text/javascript">
-					document.getElementById("complaintType${orre.id}").value='${orre.complaintType}';
-				</script>
-				<br/>
-				<a href="#" onclick="return saveComplaintType(${orre.id})">保存</a>
-			</div>
+				<br/><a href="#" onclick="return editComplaintType(event, ${orre.id})">修改</a>
 			</div>
 		</td>
 		<td><div><c:out value="${orre.matchesClientPortRelationship.client }"></c:out></div></td>
@@ -199,5 +230,9 @@ function copyDistContent(orreId) {
 	</c:forEach>
 </tbody>
 </table>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
+<script src="${ctx}/bootstrap/js/bootstrap.min.js"></script>
+
 </body>
 </html>
