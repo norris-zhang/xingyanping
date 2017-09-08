@@ -28,7 +28,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.xingyanping.datamodel.OriginalReport;
@@ -141,39 +140,6 @@ public class ExcelUtil {
 			throw new ParseException("Unknown cell type", 0);
 		}
 	}
-	public static void main(String[] args) throws Exception {
-		Workbook workbook = WorkbookFactory.create(new File("/Users/norris/Documents/projects/xingyanping/8月1日08：00-8月11日08：00（端口类不良信息分拣核实结果）汇总.xls"));
-		
-		Sheet sheet = workbook.getSheetAt(0);
-		for (Row row : sheet) {
-			for (Cell cell : row) {
-				CellReference cellRef = new CellReference(row.getRowNum(), cell.getColumnIndex());
-				
-				System.out.print(cellRef.formatAsString());
-				System.out.print(" - ");
-				CellType cellType = cell.getCellTypeEnum();
-				System.out.print(cellType);
-				System.out.print( " - ");
-				if (cellType == CellType.STRING) {
-					System.out.println(cell.getRichStringCellValue().getString());
-				} else if (cellType == CellType.NUMERIC) {
-					if (DateUtil.isCellDateFormatted(cell)) {
-						System.out.println(cell.getDateCellValue());
-					} else {
-						System.out.println(cell.getNumericCellValue());
-					}
-				} else if (cellType == CellType.BOOLEAN) {
-					System.out.println(cell.getBooleanCellValue());
-				} else if (cellType == CellType.FORMULA) {
-					System.out.println(cell.getCellFormula());
-				} else if (cellType == CellType.BLANK) {
-					System.out.println("blank");
-				} else {
-					System.out.println(cellType);
-				}
-			}
-		}
-	}
 	public static void writeOriginalReportToExcel(List<OriginalReport> list, OutputStream out, Long lastFileId) throws IOException {
 		XSSFWorkbook wb = new XSSFWorkbook();
 		CreationHelper createHelper = wb.getCreationHelper();
@@ -229,52 +195,6 @@ public class ExcelUtil {
 					}
 				}
 			}
-		}
-		wb.write(out);
-		wb.close();
-	}
-	public static void writeOriginalReportToExcelWithExtraColumns(List<OriginalReport> list, OutputStream out) throws IOException {
-		XSSFWorkbook wb = new XSSFWorkbook();
-		CreationHelper createHelper = wb.getCreationHelper();
-		Sheet sheet = wb.createSheet("不良信息资料查询");
-		
-		int rowNum = 0;
-		
-		Row title = sheet.createRow(rowNum++);
-		title.createCell(0).setCellValue(createHelper.createRichTextString("服务请求标识"));
-		title.createCell(1).setCellValue(createHelper.createRichTextString("举报手机号码"));
-		title.createCell(2).setCellValue(createHelper.createRichTextString("举报受理省"));
-		title.createCell(3).setCellValue(createHelper.createRichTextString("用户举报时间"));
-		title.createCell(4).setCellValue(createHelper.createRichTextString("被举报号码/网站地址"));
-		title.createCell(5).setCellValue(createHelper.createRichTextString("被举报号码归属省"));
-		title.createCell(6).setCellValue(createHelper.createRichTextString("归属地市"));
-		title.createCell(7).setCellValue(createHelper.createRichTextString("服务请求类别"));
-		title.createCell(8).setCellValue(createHelper.createRichTextString("业务平台名称"));
-		title.createCell(9).setCellValue(createHelper.createRichTextString("举报对象类型"));
-		title.createCell(10).setCellValue(createHelper.createRichTextString("举报内容"));
-		title.createCell(13).setCellValue(createHelper.createRichTextString("所属客户"));
-		title.createCell(14).setCellValue(createHelper.createRichTextString("简称"));
-		
-		CellStyle reportDateCellStyle = wb.createCellStyle();
-		reportDateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("yyyy-mm-dd"));
-		
-		for (OriginalReport orre : list) {
-			Row row = sheet.createRow(rowNum++);
-			row.createCell(0).setCellValue(createHelper.createRichTextString(orre.getServerRequestIdentifier()));
-			row.createCell(1).setCellValue(createHelper.createRichTextString(orre.getReportMobileNumber()));
-			row.createCell(2).setCellValue(createHelper.createRichTextString(orre.getReportProvince()));
-			Cell cell3 = row.createCell(3);
-			cell3.setCellValue(orre.getReportDate());
-			cell3.setCellStyle(reportDateCellStyle);
-			row.createCell(4).setCellValue(createHelper.createRichTextString(orre.getReportedNumber()));
-			row.createCell(5).setCellValue(createHelper.createRichTextString(orre.getReportedProvince()));
-			row.createCell(6).setCellValue(createHelper.createRichTextString(orre.getReportedCity()));
-			row.createCell(7).setCellValue(createHelper.createRichTextString(orre.getServerRequestType()));
-			row.createCell(8).setCellValue(createHelper.createRichTextString(orre.getBizPlatform()));
-			row.createCell(9).setCellValue(createHelper.createRichTextString(orre.getReportObjectType()));
-			row.createCell(10).setCellValue(createHelper.createRichTextString(orre.getReportContent()));
-			row.createCell(13).setCellValue(createHelper.createRichTextString(orre.getMatchesClientPortRelationship().getClient()));
-			row.createCell(14).setCellValue(createHelper.createRichTextString(orre.getMatchesClientPortRelationship().getCompanyShortName()));
 		}
 		wb.write(out);
 		wb.close();
