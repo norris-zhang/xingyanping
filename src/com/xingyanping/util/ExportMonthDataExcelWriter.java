@@ -2,7 +2,13 @@ package com.xingyanping.util;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.CollationKey;
+import java.text.Collator;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -19,9 +25,20 @@ public class ExportMonthDataExcelWriter {
 		this.orreList = orreList;
 	}
 	public void write(OutputStream out) throws IOException {
+		LinkedHashMap<String, List<OriginalReport>> map = typeMap();
+		
 		XSSFWorkbook wb = new XSSFWorkbook();
 		CreationHelper createHelper = wb.getCreationHelper();
-		Sheet sheet = wb.createSheet("不良信息资料查询");
+		
+		for (String key : map.keySet()) {
+			createSheet(wb, createHelper, key, map.get(key));
+		}
+		
+		wb.write(out);
+		wb.close();
+	}
+	private void createSheet(XSSFWorkbook wb, CreationHelper createHelper, String key, List<OriginalReport> categorizedList) {
+		Sheet sheet = wb.createSheet(key);
 		
 		int rowNum = 0;
 		
@@ -45,7 +62,7 @@ public class ExportMonthDataExcelWriter {
 		CellStyle reportDateCellStyle = wb.createCellStyle();
 		reportDateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("yyyy-mm-dd"));
 		
-		for (OriginalReport orre : orreList) {
+		for (OriginalReport orre : categorizedList) {
 			Row row = sheet.createRow(rowNum++);
 			row.createCell(0).setCellValue(createHelper.createRichTextString(orre.getServerRequestIdentifier()));
 			row.createCell(1).setCellValue(createHelper.createRichTextString(orre.getReportMobileNumber()));
@@ -65,8 +82,34 @@ public class ExportMonthDataExcelWriter {
 			row.createCell(13).setCellValue(createHelper.createRichTextString(orre.getMatchesClientPortRelationship().getClient()));
 			row.createCell(14).setCellValue(createHelper.createRichTextString(orre.getMatchesClientPortRelationship().getCompanyShortName()));
 		}
-		wb.write(out);
-		wb.close();
+	}
+	private LinkedHashMap<String, List<OriginalReport>> typeMap() {
+		LinkedHashMap<String, List<OriginalReport>> map = new LinkedHashMap<>();
+		map.put("A", new ArrayList<>());
+		map.put("B", new ArrayList<>());
+		map.put("C", new ArrayList<>());
+		map.put("D", new ArrayList<>());
+		map.put("E", new ArrayList<>());
+		map.put("未分类", new ArrayList<>());
+		
+		for (OriginalReport orre : orreList) {
+			map.get(orre.getComplaintType()).add(orre);
+		}
+		
+		final Collator collator = Collator.getInstance(Locale.SIMPLIFIED_CHINESE);
+		for (String key : map.keySet()) {
+			map.get(key).sort((o1, o2) -> {
+				Date reportDate1 = o1.getReportDate();
+				Date reportDate2 = o2.getReportDate();
+				if (!reportDate1.equals(reportDate2)) {
+					return reportDate1.compareTo(reportDate2);
+				}
+				CollationKey collationKey1 = collator.getCollationKey(o1.getMatchesClientPortRelationship().getClient());
+				CollationKey collationKey2 = collator.getCollationKey(o2.getMatchesClientPortRelationship().getClient());
+				return collationKey1.compareTo(collationKey2);
+			});
+		}
+		return map;
 	}
 	
 }
