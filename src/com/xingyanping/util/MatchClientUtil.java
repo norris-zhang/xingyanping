@@ -1,5 +1,9 @@
 package com.xingyanping.util;
 
+import static com.xingyanping.util.DateUtil.getDateStart;
+
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,11 +24,12 @@ public class MatchClientUtil {
 		clientNameFilter.put("国都.*", "国都");
 	}
 	public static String matchClient(OriginalReport orre, List<ClientPortRelationship> cprsList) {
+		List<ClientPortRelationship> effectiveCprsList = getEffectiveCprsList(cprsList, orre.getReportDate());
 		ClientPortRelationship matchedCprs = null;
 		String matchedPort = "";
 		String clientName = "";
 		String reportedNumber = orre.getReportedNumber();
-		for (ClientPortRelationship cprs : cprsList) {
+		for (ClientPortRelationship cprs : effectiveCprsList) {
 			String port = cprs.getPort();
 			if (reportedNumber.startsWith(port)) {
 				if (port.length() > matchedPort.length()) {
@@ -39,6 +44,23 @@ public class MatchClientUtil {
 		}
 		orre.setMatchesClientPortRelationship(matchedCprs);
 		return filterClientName(clientName);
+	}
+	private static List<ClientPortRelationship> getEffectiveCprsList(List<ClientPortRelationship> cprsList,
+			Date reportDate) {
+		reportDate = getDateStart(reportDate);
+		List<ClientPortRelationship> list = new ArrayList<>();
+		for (ClientPortRelationship cprs : cprsList) {
+			if (reportDate.before(getDateStart(cprs.getEffectiveDate()))) {
+				continue;
+			}
+			if (cprs.getExpiringDate() == null
+					|| getDateStart(cprs.getExpiringDate()).after(reportDate)
+					|| getDateStart(cprs.getExpiringDate()).equals(reportDate)) {
+				list.add(cprs);
+				continue;
+			}
+		}
+		return list;
 	}
 	private static String filterClientName(String clientName) {
 		for (Entry<String, String> entry : clientNameFilter.entrySet()) {

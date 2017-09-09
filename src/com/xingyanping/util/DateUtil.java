@@ -101,4 +101,26 @@ public class DateUtil {
 				&& c1.get(MONTH) == c2.get(MONTH)
 				&& c1.get(DATE) == c2.get(DATE);
 	}
+	
+	public static Date getDateStart(Date date) {
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		c.set(HOUR_OF_DAY, 0);
+		c.set(MINUTE, 0);
+		c.set(SECOND, 0);
+		c.set(MILLISECOND, 0);
+		
+		return c.getTime();
+	}
+	
+	public static Date getDateEnd(Date date) {
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		c.set(HOUR_OF_DAY, 23);
+		c.set(MINUTE, 59);
+		c.set(SECOND, 59);
+		c.set(MILLISECOND, 0);
+		
+		return c.getTime();
+	}
 }
