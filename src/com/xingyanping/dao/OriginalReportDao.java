@@ -2,6 +2,7 @@ package com.xingyanping.dao;
 
 import static com.xingyanping.util.DateUtil.isGT;
 import static com.xingyanping.util.MatchClientUtil.NOT_MATCH;
+import static com.xingyanping.util.MatchClientUtil.matchClient;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -29,7 +30,6 @@ import com.xingyanping.datamodel.UploadedFile;
 import com.xingyanping.util.Config;
 import com.xingyanping.util.ConnectionFactory;
 import com.xingyanping.util.ExcelUtil;
-import com.xingyanping.util.MatchClientUtil;
 import com.xingyanping.util.ZipFileContent;
 import com.xingyanping.util.ZipFileEntry;
 
@@ -217,7 +217,7 @@ public class OriginalReportDao extends BaseDao {
 		return sb.toString().getBytes();
 	}
 	private void putOriginalReportIntoClientMap(OriginalReport orre, Map<String, List<OriginalReport>> clientMap, List<ClientPortRelationship> cprsList) {
-		String client = MatchClientUtil.matchClient(orre, cprsList);
+		String client = matchClient(orre, cprsList);
 		if (!clientMap.containsKey(client)) {
 			clientMap.put(client, new ArrayList<>());
 		}
