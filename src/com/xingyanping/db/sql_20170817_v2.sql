@@ -1,1 +1,0 @@
-INSERT INTO `client_port_relationship` (`cprs_port`, `cprs_company_name`, `cprs_company_short_name`, `cprs_client`) VALUES ('1069003617','陕西鸿联九五信息产业有限公司(陕西接入)','鸿联九五','国都003617');
