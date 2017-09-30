@@ -12,6 +12,11 @@ Map<String, List<ClientPortRelationship>> clientMap = (Map<String, List<ClientPo
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Insert title here</title>
+<script type="text/javascript">
+function confirmDelete(companyShortName) {
+	return window.confirm('确定删除 ' + companyShortName);
+}
+</script>
 </head>
 <body>
 <jsp:include page="/segments/header.jsp"></jsp:include>
@@ -47,6 +52,7 @@ Map<String, List<ClientPortRelationship>> clientMap = (Map<String, List<ClientPo
 					<td><%= client.getClient() %></td>
 					<td>
 						<a href="${ctx}/clients/edit.jsp?id=<%=client.getId()%>">修改</a>
+						<a href="${ctx}/clients/delete?id=<%=client.getId()%>" onclick="return confirmDelete('<%=client.getCompanyShortName()%>')">删除</a>
 					</td>
 				</tr>
 			<% } %>
