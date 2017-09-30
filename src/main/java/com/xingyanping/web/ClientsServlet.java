@@ -3,7 +3,7 @@ package com.xingyanping.web;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +46,7 @@ public class ClientsServlet extends HttpServlet {
 	}
 
 	private Map<String, List<ClientPortRelationship>> mapClientList(List<ClientPortRelationship> clientList) {
-		Map<String, List<ClientPortRelationship>> map = new HashMap<>();
+		Map<String, List<ClientPortRelationship>> map = new LinkedHashMap<>();
 		clientList.stream().forEach((e) -> {
 			List<ClientPortRelationship> list = map.get(e.getPort());
 			if (list == null) {

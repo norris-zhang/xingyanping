@@ -173,4 +173,21 @@ public class ClientPortRelationshipDao extends BaseDao {
 			ConnectionFactory.close(rs, pstmt, conn);
 		}
 	}
+	
+	public void delete(Long id) throws SQLException {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		try {
+			conn = ConnectionFactory.getConnection();
+			String sql = "delete from client_port_relationship where cprs_id=?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setLong(1, id);
+			
+			pstmt.executeUpdate();
+		} catch (ClassNotFoundException | SQLException e) {
+			throw new SQLException(e);
+		} finally {
+			ConnectionFactory.close(null, pstmt, conn);
+		}
+	}
 }
