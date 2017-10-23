@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.xingyanping.dao.OriginalReportDao;
 import com.xingyanping.util.ZipFileContent;
+import com.xingyanping.util.ZipFileEntry;
 import com.xingyanping.util.ZipUtil;
 
 /**
@@ -36,6 +37,9 @@ public class DownloadMonthlyComplaintServlet extends HttpServlet {
 		try {
 			Long upfiId = Long.valueOf(request.getParameter("id"));
 			ZipFileContent zipFileContent = originalReportDao.getMonthlyComplaint(upfiId);
+			if (isEmptyEntryList(zipFileContent)) {
+				zipFileContent.getEntryList().add(new ZipFileEntry("monthlycomplaint/no-update", new byte[0]));
+			}
 			byte[] data = ZipUtil.zip(zipFileContent);
 
 			response.setContentType("application/zip");
@@ -47,6 +51,12 @@ public class DownloadMonthlyComplaintServlet extends HttpServlet {
 		} catch (SQLException e) {
 			throw new ServletException(e);
 		}
+	}
+
+	private boolean isEmptyEntryList(ZipFileContent zipFileContent) {
+		return zipFileContent == null
+				|| zipFileContent.getEntryList() == null
+				|| zipFileContent.getEntryList().size() == 0;
 	}
 
 }

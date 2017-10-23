@@ -3,6 +3,7 @@ package com.xingyanping.dao;
 import static com.xingyanping.util.DateUtil.isGT;
 import static com.xingyanping.util.MatchClientUtil.NOT_MATCH;
 import static com.xingyanping.util.MatchClientUtil.matchClient;
+import static com.xingyanping.util.NumberFunctions.isEQ;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -194,7 +195,7 @@ public class OriginalReportDao extends BaseDao {
 		}
 	}
 	private byte[] generateComplaintData(List<OriginalReport> list, Long lastFileId) throws IOException {
-		boolean anyMatch = list.stream().anyMatch((e)->e.getFromFileId() == lastFileId);
+		boolean anyMatch = list.stream().anyMatch(e -> isEQ(e.getFromFileId(), lastFileId, false));
 		if (!anyMatch) {
 			return null;
 		}
