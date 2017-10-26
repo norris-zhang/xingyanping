@@ -1,5 +1,6 @@
 package com.xingyanping.util;
 
+import static com.xingyanping.util.NumberFunctions.isEQ;
 import static com.xingyanping.util.PathUtil.uploadFilePath;
 import static org.apache.poi.ss.usermodel.CellType.BLANK;
 import static org.apache.poi.ss.usermodel.CellType.BOOLEAN;
@@ -186,7 +187,7 @@ public class ExcelUtil {
 			row.createCell(8);
 			row.createCell(9).setCellValue(createHelper.createRichTextString(orre.getReportObjectType()));
 			row.createCell(10).setCellValue(createHelper.createRichTextString(orre.getReportContent()));
-			if (orre.getFromFileId() == lastFileId) {
+			if (isEQ(orre.getFromFileId(), lastFileId, false)) {
 				for (Cell cell : row) {
 					if (cell.getColumnIndex() == 3) {
 						cell.setCellStyle(newDataReportDateCellStyle);
