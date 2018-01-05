@@ -53,15 +53,19 @@ public class StatByChannelDto {
 	}
 
 	public StatByChannelDto init(List<OriginalReport> list, List<ClientPortRelationship> cprsList) {
-		Map<String, Map<Integer, Integer>> reportCountMap = new HashMap<>();
+		Map<Long, Map<Integer, Integer>> reportCountMap = new HashMap<>();
 		minDate = Integer.MAX_VALUE;
 		maxDate = Integer.MIN_VALUE;
 		for (OriginalReport orre : list) {
-			String channelKey = generateChannelKey(orre.getMatchesClientPortRelationship());
-			Map<Integer, Integer> dateCountMap = reportCountMap.get(channelKey);
+			ClientPortRelationship orreCprs = orre.getMatchesClientPortRelationship();
+			if (orreCprs == null) {
+				continue;
+			}
+			Long cprsId = orreCprs.getId();
+			Map<Integer, Integer> dateCountMap = reportCountMap.get(cprsId);
 			if (dateCountMap == null) {
 				dateCountMap = new HashMap<>();
-				reportCountMap.put(channelKey, dateCountMap);
+				reportCountMap.put(cprsId, dateCountMap);
 			}
 			Date reportDate = orre.getReportDate();
 			if (reportDate == null) {
@@ -92,7 +96,7 @@ public class StatByChannelDto {
 			}
 		});
 		for (ClientPortRelationship cprs : cprsList) {
-			clientStatMap.put(generateChannelKey(cprs), calculateChannelStat(cprs, reportCountMap));
+			clientStatMap.put(generateChannelKey(cprs), calculateChannelStat(clientStatMap.get(generateChannelKey(cprs)), cprs, reportCountMap));
 		}
 		
 		return this;
@@ -102,9 +106,9 @@ public class StatByChannelDto {
 		return cprs.getCompanyShortName() + ":" + cprs.getOrder();
 	}
 
-	private List<Integer> calculateChannelStat(ClientPortRelationship cprs,
-			Map<String, Map<Integer, Integer>> reportCountMap) {
-		Map<Integer, Integer> dateCountMap = reportCountMap.get(generateChannelKey(cprs));
+	private List<Integer> calculateChannelStat(List<Integer> existingList, ClientPortRelationship cprs,
+			Map<Long, Map<Integer, Integer>> reportCountMap) {
+		Map<Integer, Integer> dateCountMap = reportCountMap.get(cprs.getId());
 		List<Integer> list = new ArrayList<>();
 		list.add(0);
 		int total = 0;
@@ -120,6 +124,16 @@ public class StatByChannelDto {
 			list.add(count);
 		}
 		list.set(0, total);
+		return sumLists(existingList, list);
+	}
+
+	private List<Integer> sumLists(List<Integer> existingList, List<Integer> list) {
+		if (existingList == null || list == null || existingList.size() != list.size()) {
+			return list;
+		}
+		for (int i = 0; i < list.size(); i++) {
+			list.set(i, existingList.get(i) + list.get(i));
+		}
 		return list;
 	}
 
