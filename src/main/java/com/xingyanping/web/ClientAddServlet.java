@@ -63,7 +63,10 @@ public class ClientAddServlet extends HttpServlet {
 				request.getRequestDispatcher("/error.jsp").forward(request, response);
 				return;
 			}
-			
+			List<ClientPortRelationship> existingShortNameCprsList = dao.retrieveByCompanyShortName(theClient.getCompanyShortName());
+			if (existingShortNameCprsList != null && existingShortNameCprsList.size() > 0) {
+				theClient.setOrder(existingShortNameCprsList.get(0).getOrder());
+			}
 			dao.insert(theClient);
 			
 			response.sendRedirect(request.getContextPath() + "/clients");

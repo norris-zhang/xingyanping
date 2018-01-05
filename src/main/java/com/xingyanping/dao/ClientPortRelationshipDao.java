@@ -151,7 +151,7 @@ public class ClientPortRelationshipDao extends BaseDao {
 		ResultSet rs = null;
 		try {
 			conn = ConnectionFactory.getConnection();
-			String sql = "insert into client_port_relationship (cprs_port, cprs_company_name, cprs_company_short_name, cprs_client, cprs_updated, cprs_effective_date, cprs_expiring_date) values (?, ?, ?, ?, ?, ?, ?)";
+			String sql = "insert into client_port_relationship (cprs_port, cprs_company_name, cprs_company_short_name, cprs_client, cprs_updated, cprs_effective_date, cprs_expiring_date, cprs_order) values (?, ?, ?, ?, ?, ?, ?, ?)";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, theClient.getPort());
 			pstmt.setString(2, theClient.getCompanyName());
@@ -165,6 +165,7 @@ public class ClientPortRelationshipDao extends BaseDao {
 			} else {
 				pstmt.setTimestamp(7, new Timestamp(theClient.getExpiringDate().getTime()));
 			}
+			pstmt.setInt(8, theClient.getOrder());
 			
 			pstmt.executeUpdate();
 		} catch (ClassNotFoundException | SQLException e) {
@@ -188,6 +189,33 @@ public class ClientPortRelationshipDao extends BaseDao {
 			throw new SQLException(e);
 		} finally {
 			ConnectionFactory.close(null, pstmt, conn);
+		}
+	}
+	
+	public List<ClientPortRelationship> retrieveByCompanyShortName(String companyShortName) throws SQLException {
+		List<ClientPortRelationship> cprsList = new ArrayList<>();
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		try {
+			conn = ConnectionFactory.getConnection();
+			String sql = "select * from client_port_relationship where cprs_company_short_name=?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, companyShortName);
+
+			rs = pstmt.executeQuery();
+			while (rs.next()) {
+				ClientPortRelationship cprs = new ClientPortRelationship();
+				cprs.populate(rs);
+
+				cprsList.add(cprs);
+			}
+			
+			return cprsList;
+		} catch (ClassNotFoundException | SQLException e) {
+			throw new SQLException(e);
+		} finally {
+			ConnectionFactory.close(rs, pstmt, conn);
 		}
 	}
 }

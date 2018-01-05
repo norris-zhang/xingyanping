@@ -92,7 +92,11 @@ public class StatByChannelDto {
 			public int compare(String o1, String o2) {
 				int order1 = Integer.parseInt(o1.split(":")[1]);
 				int order2 = Integer.parseInt(o2.split(":")[1]);
-				return order1 - order2;
+				if (order1 == order2) {
+					return o1.split(":")[0].compareTo(o2.split(":")[0]);
+				} else {
+					return order1 - order2;
+				}
 			}
 		});
 		for (ClientPortRelationship cprs : cprsList) {
