@@ -54,10 +54,11 @@ public class ExportMonthDataExcelWriter {
 		title.createCell(8).setCellValue(createHelper.createRichTextString("业务平台名称"));
 		title.createCell(9).setCellValue(createHelper.createRichTextString("举报对象类型"));
 		title.createCell(10).setCellValue(createHelper.createRichTextString("举报内容"));
-		title.createCell(11).setCellValue(createHelper.createRichTextString("下发内容"));
-		title.createCell(12).setCellValue(createHelper.createRichTextString("投诉类别"));
-		title.createCell(13).setCellValue(createHelper.createRichTextString("所属客户"));
-		title.createCell(14).setCellValue(createHelper.createRichTextString("简称"));
+		title.createCell(11).setCellValue(createHelper.createRichTextString("举报来源"));
+		title.createCell(12).setCellValue(createHelper.createRichTextString("下发内容"));
+		title.createCell(13).setCellValue(createHelper.createRichTextString("投诉类别"));
+		title.createCell(14).setCellValue(createHelper.createRichTextString("所属客户"));
+		title.createCell(15).setCellValue(createHelper.createRichTextString("简称"));
 		
 		CellStyle reportDateCellStyle = wb.createCellStyle();
 		reportDateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("yyyy-mm-dd"));
@@ -77,10 +78,11 @@ public class ExportMonthDataExcelWriter {
 			row.createCell(8).setCellValue(createHelper.createRichTextString(orre.getBizPlatform()));
 			row.createCell(9).setCellValue(createHelper.createRichTextString(orre.getReportObjectType()));
 			row.createCell(10).setCellValue(createHelper.createRichTextString(orre.getReportContent()));
-			row.createCell(11).setCellValue(createHelper.createRichTextString(orre.getDistContent()));
-			row.createCell(12).setCellValue(createHelper.createRichTextString(orre.getComplaintType()));
-			row.createCell(13).setCellValue(createHelper.createRichTextString(orre.getMatchesClientPortRelationship().getClient()));
-			row.createCell(14).setCellValue(createHelper.createRichTextString(orre.getMatchesClientPortRelationship().getCompanyShortName()));
+			row.createCell(11).setCellValue(createHelper.createRichTextString(orre.getReportSource()));
+			row.createCell(12).setCellValue(createHelper.createRichTextString(orre.getDistContent()));
+			row.createCell(13).setCellValue(createHelper.createRichTextString(orre.getComplaintType()));
+			row.createCell(14).setCellValue(createHelper.createRichTextString(orre.getMatchesClientPortRelationship().getClient()));
+			row.createCell(15).setCellValue(createHelper.createRichTextString(orre.getMatchesClientPortRelationship().getCompanyShortName()));
 		}
 	}
 	private LinkedHashMap<String, List<OriginalReport>> typeMap() {

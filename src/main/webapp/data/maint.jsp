@@ -12,7 +12,7 @@ request.setAttribute("ctx", request.getContextPath());
 <meta charset="utf-8">
 <title>Insert title here</title>
 <link rel="stylesheet" type="text/css" href="${ctx}/css/main.css?v=1" />
-<link rel="stylesheet/less" type="text/css" href="${ctx}/css/fixed-table-header.less" />
+<link rel="stylesheet/less" type="text/css" href="${ctx}/css/fixed-table-header.less?v=2" />
 <script src="//cdnjs.cloudflare.com/ajax/libs/less.js/2.7.2/less.min.js"></script>
 
 <script type="text/javascript" src="${ctx}/js/jquery-3.2.1.min.js"></script>
@@ -161,6 +161,7 @@ $(document).ready(function(){
 		<th>M</th>
 		<th>N</th>
 		<th>O</th>
+		<th>P</th>
 	</tr>
 	<tr>
 		<th>服务请求标识</th>
@@ -174,6 +175,7 @@ $(document).ready(function(){
 		<th>业务平台名称</th>
 		<th>举报对象类型</th>
 		<th>举报内容</th>
+		<th>举报来源</th>
 		<th>下发内容</th>
 		<th>投诉类别</th>
 		<th>所属客户</th>
@@ -194,6 +196,7 @@ $(document).ready(function(){
 		<td><div><c:out value="${orre.bizPlatform }"></c:out></div></td>
 		<td><div><c:out value="${orre.reportObjectType }"></c:out></div></td>
 		<td><div id="reportContent${orre.id}"><c:out value="${orre.reportContent }"></c:out></div></td>
+		<td><div><c:out value="${orre.reportSource }"></c:out></div></td>
 		<td>
 			<div>
 			<div id="editDistContent${orre.id}">

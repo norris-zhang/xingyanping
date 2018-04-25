@@ -14,11 +14,12 @@
 @column_eight_width: 40px;
 @column_nine_width: 100px;
 @column_ten_width: 40px;
-@column_eleven_width: 300px;
-@column_twelve_width: 300px;
-@column_thirteen_width: 40px;
-@column_fourteen_width: 50px;
+@column_eleven_width: 270px;
+@column_twelve_width: 60px;
+@column_thirteen_width: 270px;
+@column_fourteen_width: 40px;
 @column_fifteen_width: 50px;
+@column_sixteen_width: 50px;
 
 .fixed_headers {
   font-size: 10px;
@@ -136,6 +137,13 @@
     width: @column_fifteen_width;
     div {
     	width: @column_fifteen_width;
+    	word-wrap: break-word;
+    }
+  }
+  td:nth-child(16), th:nth-child(16) {
+    width: @column_sixteen_width;
+    div {
+    	width: @column_sixteen_width;
     	word-wrap: break-word;
     }
   }
