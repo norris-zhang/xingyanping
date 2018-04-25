@@ -24,6 +24,7 @@ public class OriginalReport extends BaseDatamodel {
 	private Date updated;
 	private String distContent;
 	private String complaintType;
+	private String reportSource;
 	
 	private UploadedFile fromFile;
 	
@@ -50,6 +51,8 @@ public class OriginalReport extends BaseDatamodel {
 		this.setUpdated(new Date(rs.getTimestamp("orre_updated").getTime()));
 		this.setDistContent(rs.getString("orre_dist_content"));
 		this.setComplaintType(rs.getString("orre_complaint_type"));
+		this.setReportSource(rs.getString("orre_report_source"));
+
 		return this;
 	}
 	public Long getId() {
@@ -166,5 +169,11 @@ public class OriginalReport extends BaseDatamodel {
 	public void setComplaintType(String complaintType) {
 		this.complaintType = complaintType;
 	}
-	
+	public String getReportSource() {
+		return reportSource;
+	}
+	public void setReportSource(String reportSource) {
+		this.reportSource = reportSource;
+	}
+
 }

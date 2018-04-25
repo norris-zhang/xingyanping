@@ -95,6 +95,7 @@ public class ExcelUtil {
 				orre.setReportContent(cellDataAsString(cell));
 				break;
 			case 11:
+				orre.setReportSource(cellDataAsString(cell));
 				break;
 			default:
 				break;
@@ -160,6 +161,7 @@ public class ExcelUtil {
 		title.createCell(8);
 		title.createCell(9).setCellValue(createHelper.createRichTextString("举报对象类型"));
 		title.createCell(10).setCellValue(createHelper.createRichTextString("举报内容"));
+		title.createCell(11).setCellValue(createHelper.createRichTextString("举报来源"));
 		
 		CellStyle reportDateCellStyle = wb.createCellStyle();
 		reportDateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("yyyy-mm-dd"));
@@ -187,6 +189,7 @@ public class ExcelUtil {
 			row.createCell(8);
 			row.createCell(9).setCellValue(createHelper.createRichTextString(orre.getReportObjectType()));
 			row.createCell(10).setCellValue(createHelper.createRichTextString(orre.getReportContent()));
+			row.createCell(11).setCellValue(createHelper.createRichTextString(orre.getReportSource()));
 			if (isEQ(orre.getFromFileId(), lastFileId, false)) {
 				for (Cell cell : row) {
 					if (cell.getColumnIndex() == 3) {
